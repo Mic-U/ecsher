@@ -7,11 +7,10 @@ import (
 	ecsTypes "github.com/aws/aws-sdk-go-v2/service/ecs/types"
 )
 
-var Client = GetClient()
-
 func GetService(cluster string, names []string) ([]ecsTypes.Service, error) {
+	client := GetClient()
 	if len(names) == 0 {
-		listServicesOutput, err := Client.ListServices(context.TODO(),
+		listServicesOutput, err := client.ListServices(context.TODO(),
 			&ecs.ListServicesInput{
 				Cluster: &cluster,
 			},
@@ -26,7 +25,8 @@ func GetService(cluster string, names []string) ([]ecsTypes.Service, error) {
 }
 
 func DescribeService(cluster string, names []string) ([]ecsTypes.Service, error) {
-	describeServicesOutput, err := Client.DescribeServices(context.TODO(),
+	client := GetClient()
+	describeServicesOutput, err := client.DescribeServices(context.TODO(),
 		&ecs.DescribeServicesInput{
 			Cluster:  &cluster,
 			Services: names,

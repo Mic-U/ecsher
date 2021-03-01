@@ -13,13 +13,9 @@ import (
 // getCmd represents the get command
 var getCmd = &cobra.Command{
 	Use:   "get",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Display resources",
+	Long: `Prints a table of important information about the specifird resources. You can filter the list using --name flag.
+	`,
 	Run: func(cmd *cobra.Command, args []string) {
 		resource := args[0]
 		if util.LikeCluster(resource) {
@@ -30,6 +26,10 @@ to quickly create a Cobra application.`,
 			fmt.Printf("%s is not ECS resource\n", resource)
 		}
 	},
+	Example: `  # List clusters
+  ecsher get cluster
+  # List services filtering by name
+  esher get service -c CLUSTER_NAME --name SERVICE_NAME`,
 }
 
 var Names []string
@@ -51,7 +51,7 @@ func init() {
 }
 
 func getCluster() {
-	clusters, err := ecs.GetCluster()
+	clusters, err := ecs.GetCluster(Names)
 	if err != nil {
 		panic(err)
 	}
