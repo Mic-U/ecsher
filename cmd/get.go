@@ -24,6 +24,8 @@ to quickly create a Cobra application.`,
 		resource := args[0]
 		if util.LikeCluster(resource) {
 			getCluster()
+		} else if util.LikeService(resource) {
+			getService()
 		} else {
 			fmt.Printf("%s is not ECS resource\n", resource)
 		}
@@ -31,8 +33,10 @@ to quickly create a Cobra application.`,
 }
 
 var Verbose bool
+var Cluster string
 
 func init() {
+	getCmd.Flags().StringVarP(&Cluster, "cluster", "c", "default", "Cluster name")
 	rootCmd.AddCommand(getCmd)
 
 	// Here you will define your flags and configuration settings.
@@ -64,6 +68,33 @@ func getCluster() {
 			cluster.RunningTasksCount,
 			cluster.PendingTasksCount,
 			cluster.RegisteredContainerInstancesCount,
+		)
+	}
+	w.Flush()
+}
+
+func getService() {
+	services, err := ecs.GetService(Cluster)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("Cluster: %s\n", Cluster)
+	if len(services) == 0 {
+		fmt.Println("No services found")
+	}
+
+	w := new(tabwriter.Writer)
+	w.Init(os.Stdout, 0, 8, 0, '\t', 0)
+	fmt.Fprintln(w, "NAME\tSTATUS\tLAUNCH_TYPE\tSCHEDULING_STRATEGY\tDESIRED\tRUNNING\tPENDING")
+	for _, service := range services {
+		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%d\t%d\t%d\n",
+			*service.ServiceName,
+			*service.Status,
+			service.LaunchType,
+			service.SchedulingStrategy,
+			service.DesiredCount,
+			service.RunningCount,
+			service.PendingCount,
 		)
 	}
 	w.Flush()
