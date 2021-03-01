@@ -3,7 +3,7 @@ package ecs
 import (
 	"context"
 
-	util "github.com/Mic-U/kecs/util"
+	util "github.com/Mic-U/ecsher/util"
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
 	ecsTypes "github.com/aws/aws-sdk-go-v2/service/ecs/types"
 )

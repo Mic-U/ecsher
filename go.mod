@@ -1,4 +1,4 @@
-module github.com/Mic-U/kecs
+module github.com/Mic-U/ecsher
 
 go 1.15
 

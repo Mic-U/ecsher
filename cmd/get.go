@@ -5,8 +5,8 @@ import (
 	"os"
 	"text/tabwriter"
 
-	"github.com/Mic-U/kecs/ecs"
-	util "github.com/Mic-U/kecs/util"
+	"github.com/Mic-U/ecsher/ecs"
+	util "github.com/Mic-U/ecsher/util"
 	"github.com/spf13/cobra"
 )
 

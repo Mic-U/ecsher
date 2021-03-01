@@ -15,7 +15,7 @@ limitations under the License.
 */
 package main
 
-import "github.com/Mic-U/kecs/cmd"
+import "github.com/Mic-U/ecsher/cmd"
 
 func main() {
 	cmd.Execute()
