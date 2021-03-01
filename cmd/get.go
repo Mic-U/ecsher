@@ -32,11 +32,10 @@ to quickly create a Cobra application.`,
 	},
 }
 
-var Verbose bool
+var Names []string
 var Cluster string
 
 func init() {
-	getCmd.Flags().StringVarP(&Cluster, "cluster", "c", "default", "Cluster name")
 	rootCmd.AddCommand(getCmd)
 
 	// Here you will define your flags and configuration settings.
@@ -47,6 +46,8 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// getCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	getCmd.Flags().StringArrayVarP(&Names, "name", "n", []string{}, "Resource name")
+	getCmd.Flags().StringVarP(&Cluster, "cluster", "c", "default", "Cluster name")
 }
 
 func getCluster() {
@@ -74,7 +75,7 @@ func getCluster() {
 }
 
 func getService() {
-	services, err := ecs.GetService(Cluster)
+	services, err := ecs.GetService(Cluster, Names)
 	if err != nil {
 		panic(err)
 	}
