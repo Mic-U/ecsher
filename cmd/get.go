@@ -17,6 +17,10 @@ var getCmd = &cobra.Command{
 	Long: `Prints a table of important information about the specifird resources. You can filter the list using --name flag.
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
+		if len(args) == 0 {
+			fmt.Println("Specify resource. Please see 'esher help get'")
+			return
+		}
 		resource := args[0]
 		if util.LikeCluster(resource) {
 			getCluster()
