@@ -36,8 +36,12 @@ var getCmd = &cobra.Command{
   esher get service -c CLUSTER_NAME --name SERVICE_NAME`,
 }
 
-var Names []string
-var Cluster string
+type GetOptions struct {
+	Names   []string
+	Cluster string
+}
+
+var getOptions GetOptions
 
 func init() {
 	rootCmd.AddCommand(getCmd)
@@ -50,12 +54,12 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// getCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	getCmd.Flags().StringArrayVarP(&Names, "name", "n", []string{}, "Resource name")
-	getCmd.Flags().StringVarP(&Cluster, "cluster", "c", "default", "Cluster name")
+	getCmd.Flags().StringArrayVarP(&getOptions.Names, "name", "n", []string{}, "Resource name")
+	getCmd.Flags().StringVarP(&getOptions.Cluster, "cluster", "c", "default", "Cluster name")
 }
 
 func getCluster() {
-	clusters, err := ecs.GetCluster(Names)
+	clusters, err := ecs.GetCluster(getOptions.Names)
 	if err != nil {
 		panic(err)
 	}
@@ -79,11 +83,11 @@ func getCluster() {
 }
 
 func getService() {
-	services, err := ecs.GetService(Cluster, Names)
+	fmt.Printf("Cluster: %s\n", getOptions.Cluster)
+	services, err := ecs.GetService(getOptions.Cluster, getOptions.Names)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("Cluster: %s\n", Cluster)
 	if len(services) == 0 {
 		fmt.Println("No services found")
 	}
