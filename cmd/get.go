@@ -5,6 +5,7 @@ import (
 	"os"
 	"text/tabwriter"
 
+	"github.com/Mic-U/ecsher/config"
 	"github.com/Mic-U/ecsher/ecs"
 	util "github.com/Mic-U/ecsher/util"
 	"github.com/spf13/cobra"
@@ -83,8 +84,9 @@ func getCluster() {
 }
 
 func getService() {
-	fmt.Printf("Cluster: %s\n", getOptions.Cluster)
-	services, err := ecs.GetService(getOptions.Cluster, getOptions.Names)
+	cluster := config.EcsherConfigManager.GetCluster(getOptions.Cluster)
+	fmt.Printf("Cluster: %s\n", cluster)
+	services, err := ecs.GetService(cluster, getOptions.Names)
 	if err != nil {
 		panic(err)
 	}
