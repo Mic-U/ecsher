@@ -7,13 +7,17 @@ import (
 )
 
 func TestGetCluster(t *testing.T) {
-	result := EcsherConfigManager.GetCluster("test")
-	if result != "test" {
-		t.Fatal("Cluster name should be 'test'")
+	result := EcsherConfigManager.GetCluster("test1")
+	if result != "test1" {
+		t.Fatal("Cluster name should be 'test1'")
 	}
 	viper.Set("cluster", "test2")
-	result = EcsherConfigManager.GetCluster("test")
+	result = EcsherConfigManager.GetCluster("")
 	if result != "test2" {
-		t.Fatal("Cluster name should be 'test'")
+		t.Fatal("Cluster name should be 'test2'")
+	}
+	result = EcsherConfigManager.GetCluster("test3")
+	if result != "test3" {
+		t.Fatal("Cluster name should be 'test3'")
 	}
 }

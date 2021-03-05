@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"path/filepath"
 
 	"github.com/mitchellh/go-homedir"
@@ -37,23 +36,24 @@ func (m EcsherConfigManagerStruct) SetCluster(cluster string) error {
 	return m.saveConfig()
 }
 
-func (m EcsherConfigManagerStruct) GetCluster(cfgFileCluster string) string {
-	cluster, ok := viper.Get(m.configNames.Cluster).(string)
-	if !ok || cluster == "" {
+func (m EcsherConfigManagerStruct) GetCluster(optionCluster string) string {
+	cfgFileCluster, ok := viper.Get(m.configNames.Cluster).(string)
+	if !ok {
+		return optionCluster
+	}
+	if optionCluster == "" && cfgFileCluster != "" {
 		return cfgFileCluster
 	}
-	return cluster
+	return optionCluster
 }
 
 func (m EcsherConfigManagerStruct) saveConfig() error {
 	if err := viper.WriteConfig(); err != nil {
-		fmt.Println(err)
 		switch err.(type) {
 		case viper.ConfigFileNotFoundError:
 			home, err := homedir.Dir()
 			if err == nil {
-				err := viper.WriteConfigAs(filepath.Join(home, DefaultConfigFileName))
-				fmt.Println(err)
+				err = viper.WriteConfigAs(filepath.Join(home, DefaultConfigFileName))
 			}
 			return err
 		}
