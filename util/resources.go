@@ -16,3 +16,8 @@ func LikeService(arg string) bool {
 func LikeTask(arg string) bool {
 	return strings.Contains(strings.ToLower(arg), "task")
 }
+
+func ArnToName(arn string) string {
+	splited := strings.Split(arn, "/")
+	return splited[len(splited)-1]
+}
