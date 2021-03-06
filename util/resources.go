@@ -12,3 +12,7 @@ func LikeService(arg string) bool {
 	}
 	return strings.Contains(strings.ToLower(arg), "service")
 }
+
+func LikeTask(arg string) bool {
+	return strings.Contains(strings.ToLower(arg), "task")
+}

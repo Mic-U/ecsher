@@ -21,3 +21,11 @@ func TestLikeService(t *testing.T) {
 		t.Fatal("svc is LikeService")
 	}
 }
+
+func TestLikeTask(t *testing.T) {
+	if !LikeTask("task") {
+		t.Fatal("task is LikeTask")
+	} else if !LikeTask("tasks") {
+		t.Fatal("tasks is LikeTask")
+	}
+}
