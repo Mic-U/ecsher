@@ -39,6 +39,7 @@ var getCmd = &cobra.Command{
   esher get service -c CLUSTER_NAME --name SERVICE_NAME`,
 }
 
+// GetOptions used in get command
 type GetOptions struct {
 	Names   []string
 	Cluster string

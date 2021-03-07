@@ -56,7 +56,10 @@ func initConfig() {
 		home, err := homedir.Dir()
 		cfgFile := filepath.Join(home, config.DefaultConfigFileName)
 		if _, err := os.Stat(cfgFile); err != nil {
-			os.Create(cfgFile)
+			_, err := os.Create(cfgFile)
+			if err != nil {
+				panic(err)
+			}
 		}
 		cobra.CheckErr(err)
 		viper.SetConfigFile(cfgFile)
