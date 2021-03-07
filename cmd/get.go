@@ -44,6 +44,7 @@ type GetOptions struct {
 	Names   []string
 	Cluster string
 	Service string
+	Region  string
 }
 
 var getOptions GetOptions
@@ -62,10 +63,11 @@ func init() {
 	getCmd.Flags().StringArrayVarP(&getOptions.Names, "name", "n", []string{}, "Resource name")
 	getCmd.Flags().StringVarP(&getOptions.Cluster, "cluster", "c", "", "Cluster name")
 	getCmd.Flags().StringVarP(&getOptions.Service, "service", "s", "", "Service name")
+	getCmd.Flags().StringVarP(&getOptions.Region, "region", "r", "", "Region")
 }
 
 func getCluster() {
-	clusters, err := ecs.GetCluster(getOptions.Names)
+	clusters, err := ecs.GetCluster(getOptions.Region, getOptions.Names)
 	if err != nil {
 		panic(err)
 	}
@@ -92,7 +94,7 @@ func getCluster() {
 func getService() {
 	cluster := config.EcsherConfigManager.GetCluster(getOptions.Cluster)
 	fmt.Printf("Cluster: %s\n", cluster)
-	services, err := ecs.GetService(cluster, getOptions.Names)
+	services, err := ecs.GetService(getOptions.Region, cluster, getOptions.Names)
 	if err != nil {
 		panic(err)
 	}
@@ -124,7 +126,7 @@ func getTask() {
 	if getOptions.Service != "" {
 		fmt.Printf("Service: %s\n", getOptions.Service)
 	}
-	tasks, err := ecs.GetTask(cluster, getOptions.Service, getOptions.Names)
+	tasks, err := ecs.GetTask(getOptions.Region, cluster, getOptions.Service, getOptions.Names)
 	if err != nil {
 		panic(err)
 	}
