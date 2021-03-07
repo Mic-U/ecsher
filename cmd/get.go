@@ -27,6 +27,8 @@ var getCmd = &cobra.Command{
 			getCluster()
 		} else if util.LikeService(resource) {
 			getService()
+		} else if util.LikeTask(resource) {
+			getTask()
 		} else {
 			fmt.Printf("%s is not ECS resource\n", resource)
 		}
@@ -40,6 +42,7 @@ var getCmd = &cobra.Command{
 type GetOptions struct {
 	Names   []string
 	Cluster string
+	Service string
 }
 
 var getOptions GetOptions
@@ -56,7 +59,8 @@ func init() {
 	// is called directly, e.g.:
 	// getCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	getCmd.Flags().StringArrayVarP(&getOptions.Names, "name", "n", []string{}, "Resource name")
-	getCmd.Flags().StringVarP(&getOptions.Cluster, "cluster", "c", "default", "Cluster name")
+	getCmd.Flags().StringVarP(&getOptions.Cluster, "cluster", "c", "", "Cluster name")
+	getCmd.Flags().StringVarP(&getOptions.Service, "service", "s", "", "Service name")
 }
 
 func getCluster() {
@@ -66,12 +70,13 @@ func getCluster() {
 	}
 	if len(clusters) == 0 {
 		fmt.Println("No clusters found")
+		return
 	}
 	w := new(tabwriter.Writer)
 	w.Init(os.Stdout, 0, 8, 0, '\t', 0)
-	fmt.Fprintln(w, "NAME\tSTATUS\tACTIVE_SERVICES\tRUNNING_TASKS\tPENDING_TASKS\tCONTAINER_INSTANCES")
+	fmt.Fprintln(w, "NAME \tSTATUS\tACTIVE_SERVICES\tRUNNING_TASKS\tPENDING_TASKS\tCONTAINER_INSTANCES")
 	for _, cluster := range clusters {
-		fmt.Fprintf(w, "%s\t%s\t%d\t%d\t%d\t%d\n",
+		fmt.Fprintf(w, "%s \t%s\t%d\t%d\t%d\t%d\n",
 			*cluster.ClusterName,
 			*cluster.Status,
 			cluster.ActiveServicesCount,
@@ -92,13 +97,14 @@ func getService() {
 	}
 	if len(services) == 0 {
 		fmt.Println("No services found")
+		return
 	}
 
 	w := new(tabwriter.Writer)
 	w.Init(os.Stdout, 0, 8, 0, '\t', 0)
-	fmt.Fprintln(w, "NAME\tSTATUS\tLAUNCH_TYPE\tSCHEDULING_STRATEGY\tDESIRED\tRUNNING\tPENDING")
+	fmt.Fprintln(w, "NAME \tSTATUS\tLAUNCH_TYPE\tSCHEDULING_STRATEGY\tDESIRED\tRUNNING\tPENDING")
 	for _, service := range services {
-		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%d\t%d\t%d\n",
+		fmt.Fprintf(w, "%s \t%s\t%s\t%s\t%d\t%d\t%d\n",
 			*service.ServiceName,
 			*service.Status,
 			service.LaunchType,
@@ -106,6 +112,38 @@ func getService() {
 			service.DesiredCount,
 			service.RunningCount,
 			service.PendingCount,
+		)
+	}
+	w.Flush()
+}
+
+func getTask() {
+	cluster := config.EcsherConfigManager.GetCluster(getOptions.Cluster)
+	fmt.Printf("Cluster: %s\n", cluster)
+	if getOptions.Service != "" {
+		fmt.Printf("Service: %s\n", getOptions.Service)
+	}
+	tasks, err := ecs.GetTask(cluster, getOptions.Service, getOptions.Names)
+	if err != nil {
+		panic(err)
+	}
+	if len(tasks) == 0 {
+		fmt.Println("No tasks found")
+		return
+	}
+
+	w := new(tabwriter.Writer)
+	w.Init(os.Stdout, 0, 8, 0, '\t', 0)
+	fmt.Fprintln(w, "NAME \tLAUNCH_TYPE \tGROUP \tCONNECTIVITY \tDESIRED_STATUS \tLAST_STATUS \tHEALTH_STATUS")
+	for _, task := range tasks {
+		fmt.Fprintf(w, "%s \t%s \t%s \t%s \t%s \t%s \t%s \n",
+			util.ArnToName(*task.TaskArn),
+			task.LaunchType,
+			*task.Group,
+			task.Connectivity,
+			*task.DesiredStatus,
+			*task.LastStatus,
+			task.HealthStatus,
 		)
 	}
 	w.Flush()
