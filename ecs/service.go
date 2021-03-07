@@ -7,8 +7,9 @@ import (
 	ecsTypes "github.com/aws/aws-sdk-go-v2/service/ecs/types"
 )
 
-func GetService(cluster string, names []string) ([]ecsTypes.Service, error) {
-	client := GetClient()
+// GetService returns Service list. If names is not specified, calls listServices API
+func GetService(region string, cluster string, names []string) ([]ecsTypes.Service, error) {
+	client := GetClient(region)
 	if len(names) == 0 {
 		listServicesOutput, err := client.ListServices(context.TODO(),
 			&ecs.ListServicesInput{
@@ -18,14 +19,14 @@ func GetService(cluster string, names []string) ([]ecsTypes.Service, error) {
 		if err != nil {
 			return nil, err
 		}
-		return DescribeService(cluster, listServicesOutput.ServiceArns)
-	} else {
-		return DescribeService(cluster, names)
+		return DescribeService(region, cluster, listServicesOutput.ServiceArns)
 	}
+	return DescribeService(region, cluster, names)
 }
 
-func DescribeService(cluster string, names []string) ([]ecsTypes.Service, error) {
-	client := GetClient()
+// DescribeService returns Service list. This requires specifying service name
+func DescribeService(region string, cluster string, names []string) ([]ecsTypes.Service, error) {
+	client := GetClient(region)
 	describeServicesOutput, err := client.DescribeServices(context.TODO(),
 		&ecs.DescribeServicesInput{
 			Cluster:  &cluster,

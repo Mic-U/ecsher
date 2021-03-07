@@ -8,16 +8,17 @@ import (
 	ecsTypes "github.com/aws/aws-sdk-go-v2/service/ecs/types"
 )
 
-func GetTask(cluster string, service string, names []string) ([]ecsTypes.Task, error) {
+// GetTask returns Cluster list. If Service is not specified, returns tasks in the service
+func GetTask(region string, cluster string, service string, names []string) ([]ecsTypes.Task, error) {
 	if service == "" {
-		return GetTaskInCluster(cluster, names)
-	} else {
-		return GetTaskInService(cluster, service, names)
+		return GetTaskInCluster(region, cluster, names)
 	}
+	return GetTaskInService(region, cluster, service, names)
 }
 
-func GetTaskInCluster(cluster string, names []string) ([]ecsTypes.Task, error) {
-	client := GetClient()
+// GetTaskInCluster returns tasks in the Cluster
+func GetTaskInCluster(region string, cluster string, names []string) ([]ecsTypes.Task, error) {
+	client := GetClient(region)
 	if len(names) == 0 {
 		listTasksOutput, err := client.ListTasks(context.TODO(),
 			&ecs.ListTasksInput{
@@ -27,14 +28,18 @@ func GetTaskInCluster(cluster string, names []string) ([]ecsTypes.Task, error) {
 		if err != nil {
 			return nil, err
 		}
-		return DescribeTask(cluster, listTasksOutput.TaskArns)
-	} else {
-		return DescribeTask(cluster, names)
+		if len(listTasksOutput.TaskArns) == 0 {
+			result := []ecsTypes.Task{}
+			return result, nil
+		}
+		return DescribeTask(region, cluster, listTasksOutput.TaskArns)
 	}
+	return DescribeTask(region, cluster, names)
 }
 
-func GetTaskInService(cluster string, service string, names []string) ([]ecsTypes.Task, error) {
-	client := GetClient()
+// GetTaskInService returns tasks in the Service in the Cluster
+func GetTaskInService(region string, cluster string, service string, names []string) ([]ecsTypes.Task, error) {
+	client := GetClient(region)
 	listTasksOutput, err := client.ListTasks(context.TODO(),
 		&ecs.ListTasksInput{
 			Cluster:     &cluster,
@@ -49,9 +54,10 @@ func GetTaskInService(cluster string, service string, names []string) ([]ecsType
 		result := []ecsTypes.Task{}
 		return result, nil
 	}
-	return DescribeTask(cluster, taskArns)
+	return DescribeTask(region, cluster, taskArns)
 }
 
+// filterTaskArns selects tasks specified in --name options
 func filterTaskArns(taskArns []string, names []string) []string {
 	if len(names) == 0 {
 		return taskArns
@@ -67,13 +73,17 @@ func filterTaskArns(taskArns []string, names []string) []string {
 	return filteredTaskArns
 }
 
-func DescribeTask(cluster string, names []string) ([]ecsTypes.Task, error) {
-	client := GetClient()
+// DescribeTask returns Task list. This requires specifying task name
+func DescribeTask(region string, cluster string, names []string) ([]ecsTypes.Task, error) {
+	client := GetClient(region)
 	describeTasksOutput, err := client.DescribeTasks(context.TODO(),
 		&ecs.DescribeTasksInput{
 			Cluster: &cluster,
 			Tasks:   names,
 		},
 	)
+	if err != nil {
+		return nil, err
+	}
 	return describeTasksOutput.Tasks, err
 }
