@@ -131,15 +131,17 @@ func getTask() {
 		fmt.Println("No tasks found")
 		return
 	}
+
 	w := new(tabwriter.Writer)
 	w.Init(os.Stdout, 0, 8, 0, '\t', 0)
-	fmt.Fprintln(w, "NAME \tLAUNCH_TYPE\tCONNECTIVITY\tAVAILABILITY_ZONE\tLAST_STATUS\tHEALTH_STATUS")
+	fmt.Fprintln(w, "NAME \tLAUNCH_TYPE \tGROUP \tCONNECTIVITY \tDESIRED_STATUS \tLAST_STATUS \tHEALTH_STATUS")
 	for _, task := range tasks {
-		fmt.Fprintf(w, "%s \t%s\t%s\t%s\t%s\t%s\n",
+		fmt.Fprintf(w, "%s \t%s \t%s \t%s \t%s \t%s \t%s \n",
 			util.ArnToName(*task.TaskArn),
 			task.LaunchType,
+			*task.Group,
 			task.Connectivity,
-			*task.AvailabilityZone,
+			*task.DesiredStatus,
 			*task.LastStatus,
 			task.HealthStatus,
 		)
