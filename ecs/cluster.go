@@ -15,6 +15,9 @@ func GetCluster(region string, names []string) ([]ecsTypes.Cluster, error) {
 		if err != nil {
 			return nil, err
 		}
+		if len(listClustersOutput.ClusterArns) == 0 {
+			return []ecsTypes.Cluster{}, nil
+		}
 		return DescribeCluster(region, listClustersOutput.ClusterArns)
 	}
 	return DescribeCluster(region, names)
