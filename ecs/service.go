@@ -19,6 +19,9 @@ func GetService(region string, cluster string, names []string) ([]ecsTypes.Servi
 		if err != nil {
 			return nil, err
 		}
+		if len(listServicesOutput.ServiceArns) == 0 {
+			return []ecsTypes.Service{}, nil
+		}
 		return DescribeService(region, cluster, listServicesOutput.ServiceArns)
 	}
 	return DescribeService(region, cluster, names)

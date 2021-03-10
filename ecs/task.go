@@ -29,8 +29,7 @@ func GetTaskInCluster(region string, cluster string, names []string) ([]ecsTypes
 			return nil, err
 		}
 		if len(listTasksOutput.TaskArns) == 0 {
-			result := []ecsTypes.Task{}
-			return result, nil
+			return []ecsTypes.Task{}, nil
 		}
 		return DescribeTask(region, cluster, listTasksOutput.TaskArns)
 	}
