@@ -29,6 +29,8 @@ var getCmd = &cobra.Command{
 			getService()
 		} else if util.LikeTask(resource) {
 			getTask()
+		} else if util.LikeDefinition(resource) {
+			getDefinition()
 		} else {
 			fmt.Printf("%s is not ECS resource\n", resource)
 		}
@@ -45,6 +47,9 @@ type GetOptions struct {
 	Cluster string
 	Service string
 	Region  string
+	Status  string
+	Prefix  string
+	Family  string
 }
 
 var getOptions GetOptions
@@ -64,6 +69,9 @@ func init() {
 	getCmd.Flags().StringVarP(&getOptions.Cluster, "cluster", "c", "", "Cluster name")
 	getCmd.Flags().StringVarP(&getOptions.Service, "service", "s", "", "Service name")
 	getCmd.Flags().StringVarP(&getOptions.Region, "region", "r", "", "Region")
+	getCmd.Flags().StringVar(&getOptions.Status, "status", "ACTIVE", "TaskDefinition status(ACTIVE or INACTIVE)")
+	getCmd.Flags().StringVar(&getOptions.Prefix, "prefix", "", "TaskDefinition name prefix")
+	getCmd.Flags().StringVar(&getOptions.Family, "family", "", "TaskDefinition family name")
 }
 
 func getCluster() {
@@ -148,6 +156,51 @@ func getTask() {
 			*task.LastStatus,
 			task.HealthStatus,
 		)
+	}
+	w.Flush()
+}
+
+func getDefinition() {
+	if getOptions.Family != "" {
+		showTaskDefinitionRevisions()
+	} else {
+		showTaskDefinitionFamilies()
+	}
+}
+
+func showTaskDefinitionFamilies() {
+	families, err := ecs.ListFamily(getOptions.Region, getOptions.Prefix, getOptions.Status)
+	if err != nil {
+		panic(err)
+	}
+	if len(families) == 0 {
+		fmt.Println("No task definitions found")
+		return
+	}
+	w := new(tabwriter.Writer)
+	w.Init(os.Stdout, 0, 8, 0, '\t', 0)
+	fmt.Fprintln(w, "NAME")
+	for _, family := range families {
+		fmt.Fprintf(w, "%s\n", family)
+	}
+	w.Flush()
+}
+
+func showTaskDefinitionRevisions() {
+	definitions, err := ecs.GetRevisions(getOptions.Region, getOptions.Family, getOptions.Status)
+	if err != nil {
+		panic(err)
+	}
+	if len(definitions) == 0 {
+		fmt.Println("No task definitions found")
+		return
+	}
+	w := new(tabwriter.Writer)
+	w.Init(os.Stdout, 0, 8, 0, '\t', 0)
+	fmt.Fprintln(w, "NAME \tREVISION")
+	for _, definition := range definitions {
+		family, revision := util.DivideTaskDefinitionArn(definition)
+		fmt.Fprintf(w, "%s \t%s\n", family, revision)
 	}
 	w.Flush()
 }
