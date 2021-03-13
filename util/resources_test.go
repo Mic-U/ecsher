@@ -27,5 +27,17 @@ func TestLikeTask(t *testing.T) {
 		t.Fatal("task is LikeTask")
 	} else if !LikeTask("tasks") {
 		t.Fatal("tasks is LikeTask")
+	} else if LikeTask("taskdef") {
+		t.Fatal("taskdef is not LikeTask")
+	}
+}
+
+func TestLikeDefinition(t *testing.T) {
+	if !LikeDefinition("taskdef") {
+		t.Fatal("taskdef is LikeDefinition")
+	} else if !LikeDefinition("definition") {
+		t.Fatal("definition is LikeDefinition")
+	} else if !LikeDefinition("definitions") {
+		t.Fatal("definitions is LikeDefinition")
 	}
 }
