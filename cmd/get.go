@@ -85,11 +85,12 @@ func init() {
 func getCluster() {
 	clusters, err := ecs.GetCluster(getOptions.Region, getOptions.Names)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 	if len(clusters) == 0 {
 		fmt.Println("No clusters found")
-		return
+		os.Exit(1)
 	}
 	w := new(tabwriter.Writer)
 	w.Init(os.Stdout, 0, 8, 0, '\t', 0)
@@ -112,11 +113,12 @@ func getService() {
 	fmt.Printf("Cluster: %s\n", cluster)
 	services, err := ecs.GetService(getOptions.Region, cluster, getOptions.Names)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 	if len(services) == 0 {
 		fmt.Println("No services found")
-		return
+		os.Exit(1)
 	}
 
 	w := new(tabwriter.Writer)
@@ -144,11 +146,12 @@ func getTask() {
 	}
 	tasks, err := ecs.GetTask(getOptions.Region, cluster, getOptions.Service, getOptions.Names)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 	if len(tasks) == 0 {
 		fmt.Println("No tasks found")
-		return
+		os.Exit(1)
 	}
 
 	w := new(tabwriter.Writer)
@@ -179,11 +182,12 @@ func getDefinition() {
 func showTaskDefinitionFamilies() {
 	families, err := ecs.ListFamily(getOptions.Region, getOptions.Prefix, getOptions.Status)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 	if len(families) == 0 {
 		fmt.Println("No task definitions found")
-		return
+		os.Exit(1)
 	}
 	w := new(tabwriter.Writer)
 	w.Init(os.Stdout, 0, 8, 0, '\t', 0)
@@ -197,11 +201,12 @@ func showTaskDefinitionFamilies() {
 func showTaskDefinitionRevisions() {
 	definitions, err := ecs.GetRevisions(getOptions.Region, getOptions.Family, getOptions.Status)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 	if len(definitions) == 0 {
 		fmt.Println("No task definitions found")
-		return
+		os.Exit(1)
 	}
 	w := new(tabwriter.Writer)
 	w.Init(os.Stdout, 0, 8, 0, '\t', 0)

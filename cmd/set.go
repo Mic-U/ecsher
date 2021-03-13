@@ -3,6 +3,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/Mic-U/ecsher/config"
 	util "github.com/Mic-U/ecsher/util"
@@ -55,7 +56,8 @@ func init() {
 func setCluster() {
 	err := config.EcsherConfigManager.SetCluster(setOptions.Name)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		os.Exit(1)
 	} else {
 		fmt.Printf("Cluster: %s\n", setOptions.Name)
 	}

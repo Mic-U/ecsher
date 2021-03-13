@@ -3,6 +3,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"os"
 	"strconv"
 
 	"github.com/Mic-U/ecsher/config"
@@ -62,15 +63,21 @@ func init() {
 func describeCluster() {
 	if describeOptions.Name == "" {
 		fmt.Println("Must specify --name")
-		return
+		os.Exit(1)
 	}
 	clusters, err := ecs.DescribeCluster(describeOptions.Region, []string{describeOptions.Name})
+	if len(clusters) == 0 {
+		fmt.Println("No cluster found")
+		os.Exit(1)
+	}
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 	cluster, err := yaml.Marshal(&clusters[0])
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 	fmt.Println(string(cluster))
 }
@@ -78,16 +85,22 @@ func describeCluster() {
 func describeService() {
 	if describeOptions.Name == "" {
 		fmt.Println("Must specify --name")
-		return
+		os.Exit(1)
 	}
 	cluster := config.EcsherConfigManager.GetCluster(describeOptions.Cluster)
 	services, err := ecs.DescribeService(describeOptions.Region, cluster, []string{describeOptions.Name})
+	if len(services) == 0 {
+		fmt.Println("No service found")
+		os.Exit(1)
+	}
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 	service, err := yaml.Marshal(&services[0])
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 	fmt.Println(string(service))
 }
@@ -95,16 +108,22 @@ func describeService() {
 func describeTask() {
 	if describeOptions.Name == "" {
 		fmt.Println("Must specify --name")
-		return
+		os.Exit(1)
 	}
 	cluster := config.EcsherConfigManager.GetCluster(describeOptions.Cluster)
 	tasks, err := ecs.DescribeTask(describeOptions.Region, cluster, []string{describeOptions.Name})
+	if len(tasks) == 0 {
+		fmt.Println("No tasks found")
+		os.Exit(1)
+	}
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 	task, err := yaml.Marshal(&tasks[0])
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 	fmt.Println(string(task))
 }
@@ -112,23 +131,24 @@ func describeTask() {
 func describeDefinition() {
 	if describeOptions.Family == "" {
 		fmt.Println("Must specify --family")
-		return
+		os.Exit(1)
 	}
 
 	if describeOptions.Revision < 1 {
 		fmt.Println("Must specify Positive number in --revision")
-		return
+		os.Exit(1)
 	}
 
 	definitionName := describeOptions.Family + ":" + strconv.Itoa(describeOptions.Revision)
 	definition, err := ecs.DescribeDefinition(describeOptions.Region, definitionName)
 	if err != nil {
 		fmt.Println(err)
-		return
+		os.Exit(1)
 	}
 	yamlDefinition, err := yaml.Marshal(definition)
 	if err != nil {
 		fmt.Println(err)
+		os.Exit(1)
 	}
 	fmt.Println(string(yamlDefinition))
 }
