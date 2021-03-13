@@ -187,7 +187,7 @@ func showTaskDefinitionFamilies() {
 	}
 	w := new(tabwriter.Writer)
 	w.Init(os.Stdout, 0, 8, 0, '\t', 0)
-	fmt.Fprintln(w, "NAME")
+	fmt.Fprintln(w, "FAMILY")
 	for _, family := range families {
 		fmt.Fprintf(w, "%s\n", family)
 	}
@@ -205,7 +205,7 @@ func showTaskDefinitionRevisions() {
 	}
 	w := new(tabwriter.Writer)
 	w.Init(os.Stdout, 0, 8, 0, '\t', 0)
-	fmt.Fprintln(w, "NAME \tREVISION")
+	fmt.Fprintln(w, "FAMILY \tREVISION")
 	for _, definition := range definitions {
 		family, revision := util.DivideTaskDefinitionArn(definition)
 		fmt.Fprintf(w, "%s \t%s\n", family, revision)
