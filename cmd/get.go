@@ -38,7 +38,15 @@ var getCmd = &cobra.Command{
 	Example: `  # List clusters
   ecsher get cluster
   # List services filtering by name
-  esher get service -c CLUSTER_NAME --name SERVICE_NAME`,
+  esher get service -c CLUSTER_NAME --name SERVICE_NAME
+  # List Tasks
+  esher get task -c CLUSTER_NAME
+  # List TaskDefinition families
+  ecsher get definition
+  ecsher get definition --prefix FAMILY_PREFIX
+  # List TaskDefinition revisions in the specified family
+  ecsher get definition --family FAMILY_NAME
+  `,
 }
 
 // GetOptions used in get command
