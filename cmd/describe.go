@@ -3,6 +3,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"strconv"
 
 	"github.com/Mic-U/ecsher/config"
 	"github.com/Mic-U/ecsher/ecs"
@@ -18,18 +19,11 @@ var describeCmd = &cobra.Command{
 	Long:  `Prints detail information about the specifird resources.`,
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {
-			return errors.New("Requires a resource")
-		}
-		if describeOptions.Name == "" {
-			return errors.New("name is not specified. Please specify name via --name option")
+			return errors.New("requires a resource")
 		}
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) == 0 {
-			fmt.Println("Specify resource. Please see 'esher help get'")
-			return
-		}
 		resource := args[0]
 
 		if util.LikeCluster(resource) {
@@ -38,15 +32,19 @@ var describeCmd = &cobra.Command{
 			describeService()
 		} else if util.LikeTask(resource) {
 			describeTask()
+		} else if util.LikeDefinition(resource) {
+			describeDefinition()
 		}
 	},
 }
 
 // DescribeOptions used in describe command
 type DescribeOptions struct {
-	Name    string
-	Cluster string
-	Region  string
+	Name     string
+	Cluster  string
+	Region   string
+	Family   string
+	Revision int
 }
 
 var describeOptions DescribeOptions
@@ -57,9 +55,15 @@ func init() {
 	describeCmd.Flags().StringVarP(&describeOptions.Name, "name", "n", "", "Resource name")
 	describeCmd.Flags().StringVarP(&describeOptions.Cluster, "cluster", "c", "", "Cluster name")
 	describeCmd.Flags().StringVarP(&describeOptions.Region, "region", "r", "", "Region")
+	describeCmd.Flags().StringVar(&describeOptions.Family, "family", "", "TaskDefinition family name")
+	describeCmd.Flags().IntVar(&describeOptions.Revision, "revision", 0, "TaskDefinition revision")
 }
 
 func describeCluster() {
+	if describeOptions.Name == "" {
+		fmt.Println("Must specify --name")
+		return
+	}
 	clusters, err := ecs.DescribeCluster(describeOptions.Region, []string{describeOptions.Name})
 	if err != nil {
 		panic(err)
@@ -72,6 +76,10 @@ func describeCluster() {
 }
 
 func describeService() {
+	if describeOptions.Name == "" {
+		fmt.Println("Must specify --name")
+		return
+	}
 	cluster := config.EcsherConfigManager.GetCluster(describeOptions.Cluster)
 	services, err := ecs.DescribeService(describeOptions.Region, cluster, []string{describeOptions.Name})
 	if err != nil {
@@ -85,6 +93,10 @@ func describeService() {
 }
 
 func describeTask() {
+	if describeOptions.Name == "" {
+		fmt.Println("Must specify --name")
+		return
+	}
 	cluster := config.EcsherConfigManager.GetCluster(describeOptions.Cluster)
 	tasks, err := ecs.DescribeTask(describeOptions.Region, cluster, []string{describeOptions.Name})
 	if err != nil {
@@ -95,4 +107,28 @@ func describeTask() {
 		panic(err)
 	}
 	fmt.Println(string(task))
+}
+
+func describeDefinition() {
+	if describeOptions.Family == "" {
+		fmt.Println("Must specify --family")
+		return
+	}
+
+	if describeOptions.Revision < 1 {
+		fmt.Println("Must specify Positive number in --revision")
+		return
+	}
+
+	definitionName := describeOptions.Family + ":" + strconv.Itoa(describeOptions.Revision)
+	definition, err := ecs.DescribeDefinition(describeOptions.Region, definitionName)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	yamlDefinition, err := yaml.Marshal(definition)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(string(yamlDefinition))
 }
