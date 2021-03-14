@@ -14,14 +14,14 @@ import (
 
 var cfgFile string
 
+const EcsherVersion = "0.0.1"
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "ecsher",
-	Short: "ecsher is the CLI tool describing AWS ECS resources.",
-	Long:  `ecsher is the CLI tool describing AWS ECS resources.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+	Use:     "ecsher",
+	Short:   "ecsher is the CLI tool describing AWS ECS resources.",
+	Long:    `ecsher is the CLI tool describing AWS ECS resources.`,
+	Version: EcsherVersion,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -37,8 +37,6 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.ecsher.toml)") // Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -52,9 +50,7 @@ func initConfig() {
 		cfgFile := filepath.Join(home, config.DefaultConfigFileName)
 		if _, err := os.Stat(cfgFile); err != nil {
 			_, err := os.Create(cfgFile)
-			if err != nil {
-				panic(err)
-			}
+			cobra.CheckErr(err)
 		}
 		cobra.CheckErr(err)
 		viper.SetConfigFile(cfgFile)
@@ -67,9 +63,7 @@ func initConfig() {
 	// 	fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
 	// }
 	err := viper.ReadInConfig()
-	if err != nil {
-		panic(err)
-	}
+	cobra.CheckErr(err)
 	if err := viper.Unmarshal(&config.EcsherConfig); err != nil {
 		fmt.Println(err)
 		os.Exit(1)

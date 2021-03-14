@@ -15,12 +15,12 @@ import (
 
 // describeCmd represents the describe command
 var describeCmd = &cobra.Command{
-	Use:   "describe",
+	Use:   "describe RESOURCE(cluster, service, task, definition)",
 	Short: "Describe detail infomation about the resource",
 	Long:  `Prints detail information about the specifird resources.`,
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {
-			return errors.New("requires a resource")
+			return errors.New("must specify resource")
 		}
 		return nil
 	},
@@ -35,8 +35,21 @@ var describeCmd = &cobra.Command{
 			describeTask()
 		} else if util.LikeDefinition(resource) {
 			describeDefinition()
+		} else {
+			fmt.Printf("%s is not ECS resource\n", resource)
+			os.Exit(1)
 		}
 	},
+	Example: `  # Describe Cluster
+  ecsher describe cluster --name CLUSTER_NAME
+  # Describe Servic
+  esher describe service -c CLUSTER_NAME --name SERVICE_NAME
+  # Describe Task
+  ecsher describe task -c CLUSTER_NAME --name TASK_NAME
+  # Describe TaskDefinition
+  ecsher describe definition --family FAMILY_NAME --revision REVISION_NUMBER
+  `,
+	Version: EcsherVersion,
 }
 
 // DescribeOptions used in describe command
@@ -70,15 +83,9 @@ func describeCluster() {
 		fmt.Println("No cluster found")
 		os.Exit(1)
 	}
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	cobra.CheckErr(err)
 	cluster, err := yaml.Marshal(&clusters[0])
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	cobra.CheckErr(err)
 	fmt.Println(string(cluster))
 }
 
@@ -93,15 +100,9 @@ func describeService() {
 		fmt.Println("No service found")
 		os.Exit(1)
 	}
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	cobra.CheckErr(err)
 	service, err := yaml.Marshal(&services[0])
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	cobra.CheckErr(err)
 	fmt.Println(string(service))
 }
 
@@ -116,15 +117,9 @@ func describeTask() {
 		fmt.Println("No tasks found")
 		os.Exit(1)
 	}
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	cobra.CheckErr(err)
 	task, err := yaml.Marshal(&tasks[0])
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	cobra.CheckErr(err)
 	fmt.Println(string(task))
 }
 
@@ -141,14 +136,8 @@ func describeDefinition() {
 
 	definitionName := describeOptions.Family + ":" + strconv.Itoa(describeOptions.Revision)
 	definition, err := ecs.DescribeDefinition(describeOptions.Region, definitionName)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	cobra.CheckErr(err)
 	yamlDefinition, err := yaml.Marshal(definition)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	cobra.CheckErr(err)
 	fmt.Println(string(yamlDefinition))
 }
