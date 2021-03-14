@@ -15,7 +15,7 @@ import (
 
 // describeCmd represents the describe command
 var describeCmd = &cobra.Command{
-	Use:   "describe RESOURCE(cluster, service, task, definition)",
+	Use:   "describe RESOURCE(cluster, service, task, definition, instance)",
 	Short: "Describe detail infomation about the resource",
 	Long:  `Prints detail information about the specifird resources.`,
 	Args: func(cmd *cobra.Command, args []string) error {
@@ -27,15 +27,18 @@ var describeCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		resource := args[0]
 
-		if util.LikeCluster(resource) {
+		switch {
+		case util.LikeCluster(resource):
 			describeCluster()
-		} else if util.LikeService(resource) {
+		case util.LikeService(resource):
 			describeService()
-		} else if util.LikeTask(resource) {
+		case util.LikeTask(resource):
 			describeTask()
-		} else if util.LikeDefinition(resource) {
+		case util.LikeDefinition(resource):
 			describeDefinition()
-		} else {
+		case util.LikeInstance(resource):
+			describeInstance()
+		default:
 			fmt.Printf("%s is not ECS resource\n", resource)
 			os.Exit(1)
 		}
@@ -48,6 +51,8 @@ var describeCmd = &cobra.Command{
   ecsher describe task -c CLUSTER_NAME --name TASK_NAME
   # Describe TaskDefinition
   ecsher describe definition --family FAMILY_NAME --revision REVISION_NUMBER
+  # Describe ContainerInstance
+  ecsher describe instance --name CONTAINER_INSTANCE_NAME -c CLUSTER_NAME
   `,
 	Version: EcsherVersion,
 }
@@ -140,4 +145,22 @@ func describeDefinition() {
 	yamlDefinition, err := yaml.Marshal(definition)
 	cobra.CheckErr(err)
 	fmt.Println(string(yamlDefinition))
+}
+
+func describeInstance() {
+	if describeOptions.Name == "" {
+		fmt.Println("Must specify --name")
+		os.Exit(1)
+	}
+	cluster := config.EcsherConfigManager.GetCluster(describeOptions.Cluster)
+	instances, err := ecs.DescribeInstance(describeOptions.Region, cluster, []string{describeOptions.Name})
+	if len(instances) == 0 {
+		fmt.Println("No container instances found")
+		os.Exit(1)
+	}
+	cobra.CheckErr(err)
+
+	instance, err := yaml.Marshal(&instances[0])
+	cobra.CheckErr(err)
+	fmt.Println(string(instance))
 }

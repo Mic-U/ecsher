@@ -14,7 +14,7 @@ import (
 
 // getCmd represents the get command
 var getCmd = &cobra.Command{
-	Use:   "get RESOURCE(cluster, service, task, definition)",
+	Use:   "get RESOURCE(cluster, service, task, definition, instance)",
 	Short: "Display resources",
 	Long:  `Prints a table of important information about the specifird resources. You can filter the list using --name flag.`,
 	Args: func(cmd *cobra.Command, args []string) error {
