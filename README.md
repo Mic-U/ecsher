@@ -29,6 +29,32 @@ Please set up AWS credentials.
 
 - [Configuration basics \- AWS Command Line Interface](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-precedence)
 
+
+### Installation
+
+1. You can install via Homebrew.
+
+```
+$ brew tap Mic-U/ecsher    
+$ brew install ecsher
+```
+
+2. You can download binary from release page.
+
+- https://github.com/Mic-U/ecsher/releases
+
+3. You can build binary.  
+Then, move binary to the directory in PATH(for example /usr/local/bin )
+
+```
+$ go build -o ecsher ./
+$ sudo mv ./ecsher /usr/local/bin/ecsher
+$ ecsher get cluster
+NAME            STATUS  ACTIVE_SERVICES RUNNING_TASKS   PENDING_TASKS   CONTAINER_INSTANCES
+MyCluster       ACTIVE  1               1               0               0
+```
+
+
 ### Cluster
 
 Show List of clusters.
@@ -169,19 +195,3 @@ attributes:
 ...
 ```
 
-## Installation
-
-You can download binary from release page.
-
-- https://github.com/Mic-U/ecsher/releases
-
-You can build binary.
-Then, move binary to the directory in PATH(for example /usr/local/bin )
-
-```
-$ go build -o ecsher ./
-$ sudo mv ./ecsher /usr/local/bin/ecsher
-$ ecsher get cluster
-NAME            STATUS  ACTIVE_SERVICES RUNNING_TASKS   PENDING_TASKS   CONTAINER_INSTANCES
-MyCluster       ACTIVE  1               1               0               0
-```
