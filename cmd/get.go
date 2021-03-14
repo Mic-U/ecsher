@@ -51,6 +51,8 @@ var getCmd = &cobra.Command{
   ecsher get definition --prefix FAMILY_PREFIX
   # List TaskDefinition revisions in the specified family
   ecsher get definition --family FAMILY_NAME
+  # List Container Instances in the specified cluster
+  ecsher get instance -c CLUSTER_NAME
   `,
 	Version: EcsherVersion,
 }
