@@ -1,4 +1,5 @@
 [![Actions Status](https://github.com/Mic-U/ecsher/workflows/lint/badge.svg)](https://github.com/Mic-U/ecsher/actions)
+[![Actions Status](https://github.com/Mic-U/ecsher/workflows/release/badge.svg)](https://github.com/Mic-U/ecsher/actions)
 
 # ECSHER
 
