@@ -36,5 +36,8 @@ func DescribeService(region string, cluster string, names []string) ([]ecsTypes.
 			Services: names,
 		},
 	)
+	if err != nil {
+		return []ecsTypes.Service{}, err
+	}
 	return describeServicesOutput.Services, err
 }

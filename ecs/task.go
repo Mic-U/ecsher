@@ -82,7 +82,7 @@ func DescribeTask(region string, cluster string, names []string) ([]ecsTypes.Tas
 		},
 	)
 	if err != nil {
-		return nil, err
+		return []ecsTypes.Task{}, err
 	}
 	return describeTasksOutput.Tasks, err
 }

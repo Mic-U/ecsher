@@ -32,5 +32,8 @@ func DescribeCluster(region string, names []string) ([]ecsTypes.Cluster, error) 
 			Clusters: names,
 		},
 	)
+	if err != nil {
+		return []ecsTypes.Cluster{}, err
+	}
 	return describeClustersOutput.Clusters, err
 }
