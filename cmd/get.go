@@ -25,17 +25,18 @@ var getCmd = &cobra.Command{
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		resource := args[0]
-		if util.LikeCluster(resource) {
+		switch {
+		case util.LikeCluster(resource):
 			getCluster()
-		} else if util.LikeService(resource) {
+		case util.LikeService(resource):
 			getService()
-		} else if util.LikeTask(resource) {
+		case util.LikeTask(resource):
 			getTask()
-		} else if util.LikeDefinition(resource) {
+		case util.LikeDefinition(resource):
 			getDefinition()
-		} else if util.LikeInstance(resource) {
+		case util.LikeInstance(resource):
 			getInstance()
-		} else {
+		default:
 			fmt.Printf("%s is not ECS resource\n", resource)
 			os.Exit(1)
 		}
