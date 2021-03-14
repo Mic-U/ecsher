@@ -14,7 +14,11 @@ import (
 
 var cfgFile string
 
-const EcsherVersion = "0.0.1"
+// These variables are set in build step
+var (
+	EcsherVersion = "0.0.1"
+	Revision      = "unset"
+)
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
