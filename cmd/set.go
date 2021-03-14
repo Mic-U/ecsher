@@ -2,6 +2,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -19,46 +20,39 @@ var setOptions SetOptions
 
 // setCmd represents the set command
 var setCmd = &cobra.Command{
-	Use:   "set",
+	Use:   "set RESOURCE(cluster)",
 	Short: "Set cluster persistently",
 	Long: `It's very annoying to enter the cluster name every time.
 When you use set command, ecsher remembers it`,
 	Example: ` # Set cluster name
   ecsher set cluster --name CLUSTER_NAME`,
-	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) == 0 {
-			fmt.Println("Specify resource. Please see 'ecsher help set'")
-			return
+	Args: func(cmd *cobra.Command, args []string) error {
+		if len(args) < 1 {
+			return errors.New("must specify resource")
 		}
+		return nil
+	},
+	Run: func(cmd *cobra.Command, args []string) {
 		resource := args[0]
 		if util.LikeCluster(resource) {
 			setCluster()
+		} else {
+			fmt.Printf("ecsher set does not support %s currently\n", resource)
+			os.Exit(1)
 		}
-		fmt.Println("set called")
+
 	},
+	Version: EcsherVersion,
 }
 
 func init() {
 	rootCmd.AddCommand(setCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// setCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// setCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	setCmd.Flags().StringVarP(&setOptions.Name, "name", "n", "", "Resource name")
 }
 
 func setCluster() {
 	err := config.EcsherConfigManager.SetCluster(setOptions.Name)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	} else {
-		fmt.Printf("Cluster: %s\n", setOptions.Name)
-	}
+	cobra.CheckErr(err)
+	fmt.Printf("Cluster: %s\n", setOptions.Name)
+
 }

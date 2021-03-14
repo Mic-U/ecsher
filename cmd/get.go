@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"text/tabwriter"
@@ -13,15 +14,16 @@ import (
 
 // getCmd represents the get command
 var getCmd = &cobra.Command{
-	Use:   "get",
+	Use:   "get RESOURCE(cluster, service, task, definition)",
 	Short: "Display resources",
-	Long: `Prints a table of important information about the specifird resources. You can filter the list using --name flag.
-	`,
-	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) == 0 {
-			fmt.Println("Specify resource. Please see 'esher help get'")
-			return
+	Long:  `Prints a table of important information about the specifird resources. You can filter the list using --name flag.`,
+	Args: func(cmd *cobra.Command, args []string) error {
+		if len(args) < 1 {
+			return errors.New("must specify resource")
 		}
+		return nil
+	},
+	Run: func(cmd *cobra.Command, args []string) {
 		resource := args[0]
 		if util.LikeCluster(resource) {
 			getCluster()
@@ -33,6 +35,7 @@ var getCmd = &cobra.Command{
 			getDefinition()
 		} else {
 			fmt.Printf("%s is not ECS resource\n", resource)
+			os.Exit(1)
 		}
 	},
 	Example: `  # List clusters
@@ -47,6 +50,7 @@ var getCmd = &cobra.Command{
   # List TaskDefinition revisions in the specified family
   ecsher get definition --family FAMILY_NAME
   `,
+	Version: EcsherVersion,
 }
 
 // GetOptions used in get command
@@ -84,10 +88,7 @@ func init() {
 
 func getCluster() {
 	clusters, err := ecs.GetCluster(getOptions.Region, getOptions.Names)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	cobra.CheckErr(err)
 	if len(clusters) == 0 {
 		fmt.Println("No clusters found")
 		os.Exit(1)
@@ -112,10 +113,7 @@ func getService() {
 	cluster := config.EcsherConfigManager.GetCluster(getOptions.Cluster)
 	fmt.Printf("Cluster: %s\n", cluster)
 	services, err := ecs.GetService(getOptions.Region, cluster, getOptions.Names)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	cobra.CheckErr(err)
 	if len(services) == 0 {
 		fmt.Println("No services found")
 		os.Exit(1)
@@ -145,10 +143,7 @@ func getTask() {
 		fmt.Printf("Service: %s\n", getOptions.Service)
 	}
 	tasks, err := ecs.GetTask(getOptions.Region, cluster, getOptions.Service, getOptions.Names)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	cobra.CheckErr(err)
 	if len(tasks) == 0 {
 		fmt.Println("No tasks found")
 		os.Exit(1)
@@ -181,10 +176,7 @@ func getDefinition() {
 
 func showTaskDefinitionFamilies() {
 	families, err := ecs.ListFamily(getOptions.Region, getOptions.Prefix, getOptions.Status)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	cobra.CheckErr(err)
 	if len(families) == 0 {
 		fmt.Println("No task definitions found")
 		os.Exit(1)
@@ -200,10 +192,7 @@ func showTaskDefinitionFamilies() {
 
 func showTaskDefinitionRevisions() {
 	definitions, err := ecs.GetRevisions(getOptions.Region, getOptions.Family, getOptions.Status)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	cobra.CheckErr(err)
 	if len(definitions) == 0 {
 		fmt.Println("No task definitions found")
 		os.Exit(1)
