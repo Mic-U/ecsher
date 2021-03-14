@@ -32,6 +32,10 @@ func LikeDefinition(arg string) bool {
 	return strings.Contains(strings.ToLower(arg), "definition")
 }
 
+func LikeInstance(arg string) bool {
+	return strings.Contains(strings.ToLower(arg), "instance")
+}
+
 func ArnToName(arn string) string {
 	splited := strings.Split(arn, "/")
 	return splited[len(splited)-1]

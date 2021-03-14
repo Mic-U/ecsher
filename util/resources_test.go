@@ -41,3 +41,11 @@ func TestLikeDefinition(t *testing.T) {
 		t.Fatal("definitions is LikeDefinition")
 	}
 }
+
+func TestLikeInstance(t *testing.T) {
+	if !LikeInstance("instance") {
+		t.Fatal("instance is LikeInstance")
+	} else if !LikeInstance("instances") {
+		t.Fatal("instances is LikeInstance")
+	}
+}

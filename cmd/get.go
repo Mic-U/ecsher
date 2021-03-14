@@ -33,6 +33,8 @@ var getCmd = &cobra.Command{
 			getTask()
 		} else if util.LikeDefinition(resource) {
 			getDefinition()
+		} else if util.LikeInstance(resource) {
+			getInstance()
 		} else {
 			fmt.Printf("%s is not ECS resource\n", resource)
 			os.Exit(1)
@@ -94,7 +96,7 @@ func getCluster() {
 		os.Exit(1)
 	}
 	w := new(tabwriter.Writer)
-	w.Init(os.Stdout, 0, 8, 0, '\t', 0)
+	w.Init(os.Stdout, 0, 8, 2, ' ', 0)
 	fmt.Fprintln(w, "NAME \tSTATUS\tACTIVE_SERVICES\tRUNNING_TASKS\tPENDING_TASKS\tCONTAINER_INSTANCES")
 	for _, cluster := range clusters {
 		fmt.Fprintf(w, "%s \t%s\t%d\t%d\t%d\t%d\n",
@@ -120,7 +122,7 @@ func getService() {
 	}
 
 	w := new(tabwriter.Writer)
-	w.Init(os.Stdout, 0, 8, 0, '\t', 0)
+	w.Init(os.Stdout, 0, 8, 2, ' ', 0)
 	fmt.Fprintln(w, "NAME \tSTATUS\tLAUNCH_TYPE\tSCHEDULING_STRATEGY\tDESIRED\tRUNNING\tPENDING")
 	for _, service := range services {
 		fmt.Fprintf(w, "%s \t%s\t%s\t%s\t%d\t%d\t%d\n",
@@ -150,7 +152,7 @@ func getTask() {
 	}
 
 	w := new(tabwriter.Writer)
-	w.Init(os.Stdout, 0, 8, 0, '\t', 0)
+	w.Init(os.Stdout, 0, 8, 2, ' ', 0)
 	fmt.Fprintln(w, "NAME \tLAUNCH_TYPE \tGROUP \tCONNECTIVITY \tDESIRED_STATUS \tLAST_STATUS \tHEALTH_STATUS")
 	for _, task := range tasks {
 		fmt.Fprintf(w, "%s \t%s \t%s \t%s \t%s \t%s \t%s \n",
@@ -182,7 +184,7 @@ func showTaskDefinitionFamilies() {
 		os.Exit(1)
 	}
 	w := new(tabwriter.Writer)
-	w.Init(os.Stdout, 0, 8, 0, '\t', 0)
+	w.Init(os.Stdout, 0, 8, 2, ' ', 0)
 	fmt.Fprintln(w, "FAMILY")
 	for _, family := range families {
 		fmt.Fprintf(w, "%s\n", family)
@@ -198,11 +200,39 @@ func showTaskDefinitionRevisions() {
 		os.Exit(1)
 	}
 	w := new(tabwriter.Writer)
-	w.Init(os.Stdout, 0, 8, 0, '\t', 0)
+	w.Init(os.Stdout, 0, 8, 2, ' ', 0)
 	fmt.Fprintln(w, "FAMILY \tREVISION")
 	for _, definition := range definitions {
 		family, revision := util.DivideTaskDefinitionArn(definition)
 		fmt.Fprintf(w, "%s \t%s\n", family, revision)
+	}
+	w.Flush()
+}
+
+func getInstance() {
+	cluster := config.EcsherConfigManager.GetCluster(getOptions.Cluster)
+	instances, err := ecs.GetInstance(getOptions.Region, cluster, getOptions.Names)
+	cobra.CheckErr(err)
+	if len(instances) == 0 {
+		fmt.Println("No container instances found")
+		os.Exit(1)
+	}
+	w := new(tabwriter.Writer)
+	w.Init(os.Stdout, 0, 8, 2, ' ', 0)
+	fmt.Fprintln(w, "NAME\tEC2_INSTANCE_ID\tSTATUS\tDOCKER_VERSION\tAGENT_VERSION\tCONNECTED\tREMAINING_CPU\tREMAINING_MEMORY\tRUNNING\tPENDING")
+	for _, instance := range instances {
+		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%t\t%s\t%s\t%d\t%d\n",
+			util.ArnToName(*instance.ContainerInstanceArn),
+			*instance.Ec2InstanceId,
+			*instance.Status,
+			*instance.VersionInfo.DockerVersion,
+			*instance.VersionInfo.AgentVersion,
+			instance.AgentConnected,
+			util.GetRemainingCpuString(instance.RemainingResources),
+			util.GetRemainingMemoryString(instance.RemainingResources),
+			instance.RunningTasksCount,
+			instance.PendingTasksCount,
+		)
 	}
 	w.Flush()
 }
