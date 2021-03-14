@@ -42,7 +42,6 @@ When you use set command, ecsher remembers it`,
 		}
 
 	},
-	Version: EcsherVersion,
 }
 
 func init() {

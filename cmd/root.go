@@ -20,12 +20,16 @@ var (
 	Revision      = "unset"
 )
 
+func VersionString() string {
+	return fmt.Sprint("\nVersion: ", EcsherVersion, "\nRevision: ", Revision)
+}
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:     "ecsher",
 	Short:   "ecsher is the CLI tool describing AWS ECS resources.",
 	Long:    `ecsher is the CLI tool describing AWS ECS resources.`,
-	Version: EcsherVersion,
+	Version: VersionString(),
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.

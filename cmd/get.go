@@ -55,7 +55,6 @@ var getCmd = &cobra.Command{
   # List Container Instances in the specified cluster
   ecsher get instance -c CLUSTER_NAME
   `,
-	Version: EcsherVersion,
 }
 
 // GetOptions used in get command

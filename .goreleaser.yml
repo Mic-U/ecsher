@@ -15,7 +15,7 @@ builds:
     binary: ecsher
     ldflags:
      - -s -w
-     - -X github.com/Mic-U/ecsher/cmd.Version={{.Version}}
+     - -X github.com/Mic-U/ecsher/cmd.EcsherVersion={{.Version}}
      - -X github.com/Mic-U/ecsher/cmd.Revision={{.ShortCommit}}
 archives:
   - replacements:

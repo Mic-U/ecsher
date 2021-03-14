@@ -54,7 +54,6 @@ var describeCmd = &cobra.Command{
   # Describe ContainerInstance
   ecsher describe instance --name CONTAINER_INSTANCE_NAME -c CLUSTER_NAME
   `,
-	Version: EcsherVersion,
 }
 
 // DescribeOptions used in describe command
