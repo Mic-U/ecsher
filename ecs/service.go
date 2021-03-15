@@ -37,7 +37,7 @@ func DescribeService(region string, cluster string, names []string) ([]ecsTypes.
 	client := GetClient(region)
 	describeServicesOutput, err := client.DescribeServices(context.TODO(),
 		&ecs.DescribeServicesInput{
-			Cluster:  &cluster,
+			Cluster:  aws.String(cluster),
 			Services: names,
 		},
 	)

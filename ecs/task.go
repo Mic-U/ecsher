@@ -67,7 +67,7 @@ func DescribeTask(region string, cluster string, names []string) ([]ecsTypes.Tas
 	client := GetClient(region)
 	describeTasksOutput, err := client.DescribeTasks(context.TODO(),
 		&ecs.DescribeTasksInput{
-			Cluster: &cluster,
+			Cluster: aws.String(cluster),
 			Tasks:   names,
 		},
 	)

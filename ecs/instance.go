@@ -36,7 +36,7 @@ func DescribeInstance(region string, cluster string, names []string) ([]types.Co
 	client := GetClient(region)
 	describeContainerInstanceOutput, err := client.DescribeContainerInstances(context.TODO(),
 		&ecs.DescribeContainerInstancesInput{
-			Cluster:            &cluster,
+			Cluster:            aws.String(cluster),
 			ContainerInstances: names,
 		},
 	)
