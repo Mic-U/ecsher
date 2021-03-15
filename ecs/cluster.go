@@ -11,14 +11,19 @@ import (
 func GetCluster(region string, names []string) ([]ecsTypes.Cluster, error) {
 	client := GetClient(region)
 	if len(names) == 0 {
-		listClustersOutput, err := client.ListClusters(context.TODO(), &ecs.ListClustersInput{})
-		if err != nil {
-			return nil, err
+		clusterArns := []string{}
+		paginater := ecs.NewListClustersPaginator(client, &ecs.ListClustersInput{})
+		for paginater.HasMorePages() {
+			output, err := paginater.NextPage(context.TODO())
+			if err != nil {
+				return []ecsTypes.Cluster{}, nil
+			}
+			clusterArns = append(clusterArns, output.ClusterArns...)
 		}
-		if len(listClustersOutput.ClusterArns) == 0 {
+		if len(clusterArns) == 0 {
 			return []ecsTypes.Cluster{}, nil
 		}
-		return DescribeCluster(region, listClustersOutput.ClusterArns)
+		return DescribeCluster(region, clusterArns)
 	}
 	return DescribeCluster(region, names)
 }

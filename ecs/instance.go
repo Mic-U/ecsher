@@ -3,6 +3,7 @@ package ecs
 import (
 	"context"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
 	"github.com/aws/aws-sdk-go-v2/service/ecs/types"
 )
@@ -10,18 +11,22 @@ import (
 func GetInstance(region string, cluster string, names []string) ([]types.ContainerInstance, error) {
 	client := GetClient(region)
 	if len(names) == 0 {
-		listContainerInstancesOutput, err := client.ListContainerInstances(context.TODO(),
-			&ecs.ListContainerInstancesInput{
-				Cluster: &cluster,
-			},
-		)
-		if err != nil {
-			return nil, err
+		instances := []string{}
+		paginater := ecs.NewListContainerInstancesPaginator(client, &ecs.ListContainerInstancesInput{
+			Cluster: aws.String(cluster),
+		})
+
+		if paginater.HasMorePages() {
+			output, err := paginater.NextPage(context.TODO())
+			if err != nil {
+				return []types.ContainerInstance{}, err
+			}
+			instances = append(instances, output.ContainerInstanceArns...)
 		}
-		if len(listContainerInstancesOutput.ContainerInstanceArns) == 0 {
+		if len(instances) == 0 {
 			return []types.ContainerInstance{}, nil
 		}
-		return DescribeInstance(region, cluster, listContainerInstancesOutput.ContainerInstanceArns)
+		return DescribeInstance(region, cluster, instances)
 	}
 	return DescribeInstance(region, cluster, names)
 

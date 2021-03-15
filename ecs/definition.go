@@ -20,11 +20,16 @@ func ListFamily(region string, prefix string, status string) ([]string, error) {
 		input.Status = "ACTIVE"
 	}
 
-	result, err := client.ListTaskDefinitionFamilies(context.TODO(), &input)
-	if err != nil {
-		return []string{}, err
+	families := []string{}
+	paginater := ecs.NewListTaskDefinitionFamiliesPaginator(client, &input)
+	if paginater.HasMorePages() {
+		output, err := paginater.NextPage(context.TODO())
+		if err != nil {
+			return families, err
+		}
+		families = append(families, output.Families...)
 	}
-	return result.Families, nil
+	return families, nil
 }
 
 func GetRevisions(region string, family string, status string) ([]string, error) {
@@ -40,11 +45,16 @@ func GetRevisions(region string, family string, status string) ([]string, error)
 		input.Status = "ACTIVE"
 	}
 
-	result, err := client.ListTaskDefinitions(context.TODO(), &input)
-	if err != nil {
-		return []string{}, err
+	definitions := []string{}
+	paginater := ecs.NewListTaskDefinitionsPaginator(client, &input)
+	if paginater.HasMorePages() {
+		output, err := paginater.NextPage(context.TODO())
+		if err != nil {
+			return definitions, err
+		}
+		definitions = append(definitions, output.TaskDefinitionArns...)
 	}
-	return result.TaskDefinitionArns, err
+	return definitions, nil
 }
 
 func DescribeDefinition(region string, name string) (types.TaskDefinition, error) {
