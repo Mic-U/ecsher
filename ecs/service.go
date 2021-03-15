@@ -3,6 +3,7 @@ package ecs
 import (
 	"context"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
 	ecsTypes "github.com/aws/aws-sdk-go-v2/service/ecs/types"
 )
@@ -11,18 +12,22 @@ import (
 func GetService(region string, cluster string, names []string) ([]ecsTypes.Service, error) {
 	client := GetClient(region)
 	if len(names) == 0 {
-		listServicesOutput, err := client.ListServices(context.TODO(),
-			&ecs.ListServicesInput{
-				Cluster: &cluster,
-			},
-		)
-		if err != nil {
-			return nil, err
+		serviceNames := []string{}
+		paginater := ecs.NewListServicesPaginator(client, &ecs.ListServicesInput{
+			Cluster: aws.String(cluster),
+		})
+		if paginater.HasMorePages() {
+			output, err := paginater.NextPage(context.TODO())
+			if err != nil {
+				return []ecsTypes.Service{}, err
+			}
+			serviceNames = append(serviceNames, output.ServiceArns...)
 		}
-		if len(listServicesOutput.ServiceArns) == 0 {
+
+		if len(serviceNames) == 0 {
 			return []ecsTypes.Service{}, nil
 		}
-		return DescribeService(region, cluster, listServicesOutput.ServiceArns)
+		return DescribeService(region, cluster, serviceNames)
 	}
 	return DescribeService(region, cluster, names)
 }
@@ -32,7 +37,7 @@ func DescribeService(region string, cluster string, names []string) ([]ecsTypes.
 	client := GetClient(region)
 	describeServicesOutput, err := client.DescribeServices(context.TODO(),
 		&ecs.DescribeServicesInput{
-			Cluster:  &cluster,
+			Cluster:  aws.String(cluster),
 			Services: names,
 		},
 	)

@@ -3,6 +3,7 @@ package ecs
 import (
 	"context"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
 	"github.com/aws/aws-sdk-go-v2/service/ecs/types"
 )
@@ -11,7 +12,7 @@ func ListFamily(region string, prefix string, status string) ([]string, error) {
 	client := GetClient(region)
 	input := ecs.ListTaskDefinitionFamiliesInput{}
 	if prefix != "" {
-		input.FamilyPrefix = &prefix
+		input.FamilyPrefix = aws.String(prefix)
 	}
 
 	if status == "ACTIVE" || status == "INACTIVE" {
@@ -20,11 +21,16 @@ func ListFamily(region string, prefix string, status string) ([]string, error) {
 		input.Status = "ACTIVE"
 	}
 
-	result, err := client.ListTaskDefinitionFamilies(context.TODO(), &input)
-	if err != nil {
-		return []string{}, err
+	families := []string{}
+	paginater := ecs.NewListTaskDefinitionFamiliesPaginator(client, &input)
+	if paginater.HasMorePages() {
+		output, err := paginater.NextPage(context.TODO())
+		if err != nil {
+			return families, err
+		}
+		families = append(families, output.Families...)
 	}
-	return result.Families, nil
+	return families, nil
 }
 
 func GetRevisions(region string, family string, status string) ([]string, error) {
@@ -32,7 +38,7 @@ func GetRevisions(region string, family string, status string) ([]string, error)
 	input := ecs.ListTaskDefinitionsInput{}
 
 	if family != "" {
-		input.FamilyPrefix = &family
+		input.FamilyPrefix = aws.String(family)
 	}
 	if status == "ACTIVE" || status == "INACTIVE" {
 		input.Status = types.TaskDefinitionStatus(status)
@@ -40,17 +46,22 @@ func GetRevisions(region string, family string, status string) ([]string, error)
 		input.Status = "ACTIVE"
 	}
 
-	result, err := client.ListTaskDefinitions(context.TODO(), &input)
-	if err != nil {
-		return []string{}, err
+	definitions := []string{}
+	paginater := ecs.NewListTaskDefinitionsPaginator(client, &input)
+	if paginater.HasMorePages() {
+		output, err := paginater.NextPage(context.TODO())
+		if err != nil {
+			return definitions, err
+		}
+		definitions = append(definitions, output.TaskDefinitionArns...)
 	}
-	return result.TaskDefinitionArns, err
+	return definitions, nil
 }
 
 func DescribeDefinition(region string, name string) (types.TaskDefinition, error) {
 	client := GetClient(region)
 	definition, err := client.DescribeTaskDefinition(context.TODO(), &ecs.DescribeTaskDefinitionInput{
-		TaskDefinition: &name,
+		TaskDefinition: aws.String(name),
 	})
 	if err != nil {
 		return types.TaskDefinition{}, err
