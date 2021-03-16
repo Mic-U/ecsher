@@ -7,7 +7,7 @@ import (
 	ecsTypes "github.com/aws/aws-sdk-go-v2/service/ecs/types"
 )
 
-type ECSClusterAPI interface {
+type ECSClusterClient interface {
 	DescribeClusters(context.Context, *ecs.DescribeClustersInput, ...func(*ecs.Options)) (*ecs.DescribeClustersOutput, error)
 	ListClusters(context.Context, *ecs.ListClustersInput, ...func(*ecs.Options)) (*ecs.ListClustersOutput, error)
 }
@@ -18,7 +18,7 @@ type ListClustersPager interface {
 }
 
 // GetCluster returns Cluster list. If names is not specified, calls listClusters API
-func GetCluster(client ECSClusterAPI, names []string) ([]ecsTypes.Cluster, error) {
+func GetCluster(client ECSClusterClient, names []string) ([]ecsTypes.Cluster, error) {
 	if len(names) == 0 {
 		paginator := ecs.NewListClustersPaginator(client, &ecs.ListClustersInput{})
 		clusterArns, err := ListAllClusters(context.TODO(), paginator)
@@ -46,7 +46,7 @@ func ListAllClusters(ctx context.Context, paginator ListClustersPager) ([]string
 }
 
 // DescribeCluster returns Cluster list. This requires specifying cluster name
-func DescribeCluster(client ECSClusterAPI, names []string) ([]ecsTypes.Cluster, error) {
+func DescribeCluster(client ECSClusterClient, names []string) ([]ecsTypes.Cluster, error) {
 	describeClustersOutput, err := client.DescribeClusters(
 		context.TODO(),
 		&ecs.DescribeClustersInput{
