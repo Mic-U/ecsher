@@ -48,7 +48,7 @@ func GetRevisions(region string, family string, status string) ([]string, error)
 
 	definitions := []string{}
 	paginater := ecs.NewListTaskDefinitionsPaginator(client, &input)
-	if paginater.HasMorePages() {
+	for paginater.HasMorePages() {
 		output, err := paginater.NextPage(context.TODO())
 		if err != nil {
 			return definitions, err
