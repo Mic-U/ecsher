@@ -8,33 +8,48 @@ import (
 	ecsTypes "github.com/aws/aws-sdk-go-v2/service/ecs/types"
 )
 
+type ECSServiceClient interface {
+	DescribeServices(context.Context, *ecs.DescribeServicesInput, ...func(*ecs.Options)) (*ecs.DescribeServicesOutput, error)
+	ListServices(context.Context, *ecs.ListServicesInput, ...func(*ecs.Options)) (*ecs.ListServicesOutput, error)
+}
+
+type ListServicesPager interface {
+	HasMorePages() bool
+	NextPage(context.Context, ...func(*ecs.Options)) (*ecs.ListServicesOutput, error)
+}
+
 // GetService returns Service list. If names is not specified, calls listServices API
-func GetService(region string, cluster string, names []string) ([]ecsTypes.Service, error) {
-	client := GetClient(region)
+func GetService(client ECSServiceClient, cluster string, names []string) ([]ecsTypes.Service, error) {
 	if len(names) == 0 {
-		serviceNames := []string{}
-		paginater := ecs.NewListServicesPaginator(client, &ecs.ListServicesInput{
+		paginator := ecs.NewListServicesPaginator(client, &ecs.ListServicesInput{
 			Cluster: aws.String(cluster),
 		})
-		if paginater.HasMorePages() {
-			output, err := paginater.NextPage(context.TODO())
-			if err != nil {
-				return []ecsTypes.Service{}, err
-			}
-			serviceNames = append(serviceNames, output.ServiceArns...)
+		serviceArns, err := ListAllServices(context.TODO(), paginator)
+		if err != nil {
+			return []ecsTypes.Service{}, err
 		}
-
-		if len(serviceNames) == 0 {
+		if len(serviceArns) == 0 {
 			return []ecsTypes.Service{}, nil
 		}
-		return DescribeService(region, cluster, serviceNames)
+		return DescribeService(client, cluster, serviceArns)
 	}
-	return DescribeService(region, cluster, names)
+	return DescribeService(client, cluster, names)
+}
+
+func ListAllServices(ctx context.Context, paginator ListServicesPager) ([]string, error) {
+	serviceArns := []string{}
+	for paginator.HasMorePages() {
+		output, err := paginator.NextPage(ctx)
+		if err != nil {
+			return []string{}, err
+		}
+		serviceArns = append(serviceArns, output.ServiceArns...)
+	}
+	return serviceArns, nil
 }
 
 // DescribeService returns Service list. This requires specifying service name
-func DescribeService(region string, cluster string, names []string) ([]ecsTypes.Service, error) {
-	client := GetClient(region)
+func DescribeService(client ECSServiceClient, cluster string, names []string) ([]ecsTypes.Service, error) {
 	describeServicesOutput, err := client.DescribeServices(context.TODO(),
 		&ecs.DescribeServicesInput{
 			Cluster:  aws.String(cluster),

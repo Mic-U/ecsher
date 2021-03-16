@@ -100,7 +100,8 @@ func describeService() {
 		os.Exit(1)
 	}
 	cluster := config.EcsherConfigManager.GetCluster(describeOptions.Cluster)
-	services, err := ecs.DescribeService(describeOptions.Region, cluster, []string{describeOptions.Name})
+	client := ecs.GetClient(describeOptions.Region)
+	services, err := ecs.DescribeService(client, cluster, []string{describeOptions.Name})
 	if len(services) == 0 {
 		fmt.Println("No service found")
 		os.Exit(1)

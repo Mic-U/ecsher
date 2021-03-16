@@ -36,7 +36,7 @@ func GetCluster(client ECSClusterClient, names []string) ([]ecsTypes.Cluster, er
 func ListAllClusters(ctx context.Context, paginator ListClustersPager) ([]string, error) {
 	clusterArns := []string{}
 	for paginator.HasMorePages() {
-		output, err := paginator.NextPage(context.TODO())
+		output, err := paginator.NextPage(ctx)
 		if err != nil {
 			return []string{}, err
 		}
