@@ -16,7 +16,7 @@ func GetInstance(region string, cluster string, names []string) ([]types.Contain
 			Cluster: aws.String(cluster),
 		})
 
-		if paginater.HasMorePages() {
+		for paginater.HasMorePages() {
 			output, err := paginater.NextPage(context.TODO())
 			if err != nil {
 				return []types.ContainerInstance{}, err
