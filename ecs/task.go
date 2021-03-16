@@ -24,7 +24,7 @@ func GetTaskInCluster(region string, cluster string, names []string) ([]ecsTypes
 		paginater := ecs.NewListTasksPaginator(client, &ecs.ListTasksInput{
 			Cluster: aws.String(cluster),
 		})
-		if paginater.HasMorePages() {
+		for paginater.HasMorePages() {
 			output, err := paginater.NextPage(context.TODO())
 			if err != nil {
 				return []ecsTypes.Task{}, nil
