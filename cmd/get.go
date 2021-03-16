@@ -91,7 +91,8 @@ func init() {
 }
 
 func getCluster() {
-	clusters, err := ecs.GetCluster(getOptions.Region, getOptions.Names)
+	client := ecs.GetClient(getOptions.Region)
+	clusters, err := ecs.GetCluster(client, getOptions.Names)
 	cobra.CheckErr(err)
 	if len(clusters) == 0 {
 		fmt.Println("No clusters found")
