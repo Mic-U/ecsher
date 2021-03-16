@@ -82,7 +82,8 @@ func describeCluster() {
 		fmt.Println("Must specify --name")
 		os.Exit(1)
 	}
-	clusters, err := ecs.DescribeCluster(describeOptions.Region, []string{describeOptions.Name})
+	client := ecs.GetClient(describeOptions.Region)
+	clusters, err := ecs.DescribeCluster(client, []string{describeOptions.Name})
 	if len(clusters) == 0 {
 		fmt.Println("No cluster found")
 		os.Exit(1)
@@ -99,7 +100,8 @@ func describeService() {
 		os.Exit(1)
 	}
 	cluster := config.EcsherConfigManager.GetCluster(describeOptions.Cluster)
-	services, err := ecs.DescribeService(describeOptions.Region, cluster, []string{describeOptions.Name})
+	client := ecs.GetClient(describeOptions.Region)
+	services, err := ecs.DescribeService(client, cluster, []string{describeOptions.Name})
 	if len(services) == 0 {
 		fmt.Println("No service found")
 		os.Exit(1)

@@ -7,30 +7,46 @@ import (
 	ecsTypes "github.com/aws/aws-sdk-go-v2/service/ecs/types"
 )
 
+type ECSClusterClient interface {
+	DescribeClusters(context.Context, *ecs.DescribeClustersInput, ...func(*ecs.Options)) (*ecs.DescribeClustersOutput, error)
+	ListClusters(context.Context, *ecs.ListClustersInput, ...func(*ecs.Options)) (*ecs.ListClustersOutput, error)
+}
+
+type ListClustersPager interface {
+	HasMorePages() bool
+	NextPage(context.Context, ...func(*ecs.Options)) (*ecs.ListClustersOutput, error)
+}
+
 // GetCluster returns Cluster list. If names is not specified, calls listClusters API
-func GetCluster(region string, names []string) ([]ecsTypes.Cluster, error) {
-	client := GetClient(region)
+func GetCluster(client ECSClusterClient, names []string) ([]ecsTypes.Cluster, error) {
 	if len(names) == 0 {
-		clusterArns := []string{}
-		paginater := ecs.NewListClustersPaginator(client, &ecs.ListClustersInput{})
-		for paginater.HasMorePages() {
-			output, err := paginater.NextPage(context.TODO())
-			if err != nil {
-				return []ecsTypes.Cluster{}, nil
-			}
-			clusterArns = append(clusterArns, output.ClusterArns...)
+		paginator := ecs.NewListClustersPaginator(client, &ecs.ListClustersInput{})
+		clusterArns, err := ListAllClusters(context.TODO(), paginator)
+		if err != nil {
+			return []ecsTypes.Cluster{}, err
 		}
 		if len(clusterArns) == 0 {
 			return []ecsTypes.Cluster{}, nil
 		}
-		return DescribeCluster(region, clusterArns)
+		return DescribeCluster(client, clusterArns)
 	}
-	return DescribeCluster(region, names)
+	return DescribeCluster(client, names)
+}
+
+func ListAllClusters(ctx context.Context, paginator ListClustersPager) ([]string, error) {
+	clusterArns := []string{}
+	for paginator.HasMorePages() {
+		output, err := paginator.NextPage(ctx)
+		if err != nil {
+			return []string{}, err
+		}
+		clusterArns = append(clusterArns, output.ClusterArns...)
+	}
+	return clusterArns, nil
 }
 
 // DescribeCluster returns Cluster list. This requires specifying cluster name
-func DescribeCluster(region string, names []string) ([]ecsTypes.Cluster, error) {
-	client := GetClient(region)
+func DescribeCluster(client ECSClusterClient, names []string) ([]ecsTypes.Cluster, error) {
 	describeClustersOutput, err := client.DescribeClusters(
 		context.TODO(),
 		&ecs.DescribeClustersInput{

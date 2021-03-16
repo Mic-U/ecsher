@@ -91,7 +91,8 @@ func init() {
 }
 
 func getCluster() {
-	clusters, err := ecs.GetCluster(getOptions.Region, getOptions.Names)
+	client := ecs.GetClient(getOptions.Region)
+	clusters, err := ecs.GetCluster(client, getOptions.Names)
 	cobra.CheckErr(err)
 	if len(clusters) == 0 {
 		fmt.Println("No clusters found")
@@ -116,7 +117,8 @@ func getCluster() {
 func getService() {
 	cluster := config.EcsherConfigManager.GetCluster(getOptions.Cluster)
 	fmt.Printf("Cluster: %s\n", cluster)
-	services, err := ecs.GetService(getOptions.Region, cluster, getOptions.Names)
+	client := ecs.GetClient(getOptions.Region)
+	services, err := ecs.GetService(client, cluster, getOptions.Names)
 	cobra.CheckErr(err)
 	if len(services) == 0 {
 		fmt.Println("No services found")
