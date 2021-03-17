@@ -118,7 +118,8 @@ func describeTask() {
 		os.Exit(1)
 	}
 	cluster := config.EcsherConfigManager.GetCluster(describeOptions.Cluster)
-	tasks, err := ecs.DescribeTask(describeOptions.Region, cluster, []string{describeOptions.Name})
+	client := ecs.GetClient(describeOptions.Region)
+	tasks, err := ecs.DescribeTask(client, cluster, []string{describeOptions.Name})
 	if len(tasks) == 0 {
 		fmt.Println("No tasks found")
 		os.Exit(1)

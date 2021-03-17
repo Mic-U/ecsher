@@ -148,7 +148,8 @@ func getTask() {
 	if getOptions.Service != "" {
 		fmt.Printf("Service: %s\n", getOptions.Service)
 	}
-	tasks, err := ecs.GetTask(getOptions.Region, cluster, getOptions.Service, getOptions.Names)
+	client := ecs.GetClient(getOptions.Region)
+	tasks, err := ecs.GetTask(client, cluster, getOptions.Service, getOptions.Names)
 	cobra.CheckErr(err)
 	if len(tasks) == 0 {
 		fmt.Println("No tasks found")

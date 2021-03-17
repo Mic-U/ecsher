@@ -31,4 +31,11 @@ func TestGetValue(t *testing.T) {
 		fmt.Println(GetValue(*testIntegerResource))
 		t.Fatal("Failed to convert DoubleValue")
 	}
+
+	otherType := "OTHER"
+	testIntegerResource.Type = &otherType
+	if GetValue(*testIntegerResource) != "0" {
+		fmt.Println(GetValue(*testIntegerResource))
+		t.Fatal("Failed to convert DoubleValue")
+	}
 }
