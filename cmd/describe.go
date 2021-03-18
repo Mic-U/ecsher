@@ -142,7 +142,8 @@ func describeDefinition() {
 	}
 
 	definitionName := describeOptions.Family + ":" + strconv.Itoa(describeOptions.Revision)
-	definition, err := ecs.DescribeDefinition(describeOptions.Region, definitionName)
+	client := ecs.GetClient(describeOptions.Region)
+	definition, err := ecs.DescribeDefinition(client, definitionName)
 	cobra.CheckErr(err)
 	yamlDefinition, err := yaml.Marshal(definition)
 	cobra.CheckErr(err)

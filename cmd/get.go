@@ -182,7 +182,8 @@ func getDefinition() {
 }
 
 func showTaskDefinitionFamilies() {
-	families, err := ecs.ListFamily(getOptions.Region, getOptions.Prefix, getOptions.Status)
+	client := ecs.GetClient(getOptions.Region)
+	families, err := ecs.GetFamily(client, getOptions.Prefix, getOptions.Status)
 	cobra.CheckErr(err)
 	if len(families) == 0 {
 		fmt.Println("No task definitions found")
@@ -198,7 +199,8 @@ func showTaskDefinitionFamilies() {
 }
 
 func showTaskDefinitionRevisions() {
-	definitions, err := ecs.GetRevisions(getOptions.Region, getOptions.Family, getOptions.Status)
+	client := ecs.GetClient(getOptions.Region)
+	definitions, err := ecs.GetRevision(client, getOptions.Family, getOptions.Status)
 	cobra.CheckErr(err)
 	if len(definitions) == 0 {
 		fmt.Println("No task definitions found")

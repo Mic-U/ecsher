@@ -52,7 +52,6 @@ func (m *mockServicePager) NextPage(ctx context.Context, optFns ...func(*ecs.Opt
 	}
 	output = m.Pages[m.PageNum]
 	m.PageNum++
-	fmt.Println(m.PageNum)
 	return output, nil
 }
 
