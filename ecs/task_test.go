@@ -37,7 +37,6 @@ func (m mockTaskClient) ListTasks(ctx context.Context, params *ecs.ListTasksInpu
 	if len(*params.Cluster) == 0 {
 		return nil, errors.New("required param is missing")
 	}
-	fmt.Println("s")
 	return &m.listTasksOutput, nil
 }
 
@@ -56,7 +55,6 @@ func (m *mockTaskPager) NextPage(ctx context.Context, optFns ...func(*ecs.Option
 	}
 	output = m.Pages[m.PageNum]
 	m.PageNum++
-	fmt.Println(m.PageNum)
 	return output, nil
 }
 

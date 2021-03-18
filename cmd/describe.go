@@ -155,7 +155,8 @@ func describeInstance() {
 		os.Exit(1)
 	}
 	cluster := config.EcsherConfigManager.GetCluster(describeOptions.Cluster)
-	instances, err := ecs.DescribeInstance(describeOptions.Region, cluster, []string{describeOptions.Name})
+	client := ecs.GetClient(describeOptions.Region)
+	instances, err := ecs.DescribeInstance(client, cluster, []string{describeOptions.Name})
 	if len(instances) == 0 {
 		fmt.Println("No container instances found")
 		os.Exit(1)

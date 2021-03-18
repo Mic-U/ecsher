@@ -216,7 +216,9 @@ func showTaskDefinitionRevisions() {
 
 func getInstance() {
 	cluster := config.EcsherConfigManager.GetCluster(getOptions.Cluster)
-	instances, err := ecs.GetInstance(getOptions.Region, cluster, getOptions.Names)
+	fmt.Printf("Cluster: %s\n", cluster)
+	client := ecs.GetClient(getOptions.Region)
+	instances, err := ecs.GetInstance(client, cluster, getOptions.Names)
 	cobra.CheckErr(err)
 	if len(instances) == 0 {
 		fmt.Println("No container instances found")
