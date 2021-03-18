@@ -44,6 +44,7 @@ func ListAllFamilies(ctx context.Context, paginator ListTaskDefinitionFamiliesPa
 	families := []string{}
 	for paginator.HasMorePages() {
 		output, err := paginator.NextPage(ctx)
+
 		if err != nil {
 			return families, err
 		}

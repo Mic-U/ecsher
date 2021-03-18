@@ -24,6 +24,7 @@ func GetInstance(client ECSInstanceClient, cluster string, names []string) ([]ty
 			Cluster: aws.String(cluster),
 		})
 
+
 		instances, err := ListAllInstances(context.TODO(), paginator)
 		if err != nil {
 			return []types.ContainerInstance{}, err
