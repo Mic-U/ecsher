@@ -21,3 +21,10 @@ func TestGetCluster(t *testing.T) {
 		t.Fatal("Cluster name should be 'test3'")
 	}
 }
+
+func TestSecCluster(t *testing.T) {
+	result := EcsherConfigManager.SetCluster("test1")
+	if result != nil {
+		t.Fatalf("expect no error, got %v", result)
+	}
+}

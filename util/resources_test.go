@@ -49,3 +49,28 @@ func TestLikeInstance(t *testing.T) {
 		t.Fatal("instances is LikeInstance")
 	}
 }
+
+func TestDivideTaskDefinitionArn(t *testing.T) {
+	cases := []struct {
+		Arn       string
+		expected1 string
+		expected2 string
+	}{
+		{
+			Arn:       "arn:aws:ecs:region:account:task-definition/family:1",
+			expected1: "family",
+			expected2: "1",
+		},
+		{
+			Arn:       "arn:aws:ecs:region:account:task-definition/family1",
+			expected1: "family1",
+			expected2: "",
+		},
+	}
+	for _, c := range cases {
+		actual1, actual2 := DivideTaskDefinitionArn(c.Arn)
+		if actual1 != c.expected1 || actual2 != c.expected2 {
+			t.Errorf("expect [%v, %v], got [%v, %v]", c.expected1, c.expected2, actual1, actual2)
+		}
+	}
+}

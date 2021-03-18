@@ -8,8 +8,23 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ecs/types"
 )
 
-func ListFamily(region string, prefix string, status string) ([]string, error) {
-	client := GetClient(region)
+type ECSTaskDefinitionClient interface {
+	DescribeTaskDefinition(context.Context, *ecs.DescribeTaskDefinitionInput, ...func(*ecs.Options)) (*ecs.DescribeTaskDefinitionOutput, error)
+	ListTaskDefinitionFamilies(context.Context, *ecs.ListTaskDefinitionFamiliesInput, ...func(*ecs.Options)) (*ecs.ListTaskDefinitionFamiliesOutput, error)
+	ListTaskDefinitions(context.Context, *ecs.ListTaskDefinitionsInput, ...func(*ecs.Options)) (*ecs.ListTaskDefinitionsOutput, error)
+}
+
+type ListTaskDefinitionFamiliesPager interface {
+	HasMorePages() bool
+	NextPage(context.Context, ...func(*ecs.Options)) (*ecs.ListTaskDefinitionFamiliesOutput, error)
+}
+
+type ListTaskDefinitionsPager interface {
+	HasMorePages() bool
+	NextPage(context.Context, ...func(*ecs.Options)) (*ecs.ListTaskDefinitionsOutput, error)
+}
+
+func GetFamily(client ECSTaskDefinitionClient, prefix string, status string) ([]string, error) {
 	input := ecs.ListTaskDefinitionFamiliesInput{}
 	if prefix != "" {
 		input.FamilyPrefix = aws.String(prefix)
@@ -21,10 +36,15 @@ func ListFamily(region string, prefix string, status string) ([]string, error) {
 		input.Status = "ACTIVE"
 	}
 
+	paginator := ecs.NewListTaskDefinitionFamiliesPaginator(client, &input)
+	return ListAllFamilies(context.TODO(), paginator)
+}
+
+func ListAllFamilies(ctx context.Context, paginator ListTaskDefinitionFamiliesPager) ([]string, error) {
 	families := []string{}
-	paginater := ecs.NewListTaskDefinitionFamiliesPaginator(client, &input)
-	for paginater.HasMorePages() {
-		output, err := paginater.NextPage(context.TODO())
+	for paginator.HasMorePages() {
+		output, err := paginator.NextPage(ctx)
+
 		if err != nil {
 			return families, err
 		}
@@ -33,8 +53,7 @@ func ListFamily(region string, prefix string, status string) ([]string, error) {
 	return families, nil
 }
 
-func GetRevisions(region string, family string, status string) ([]string, error) {
-	client := GetClient(region)
+func GetRevision(client ECSTaskDefinitionClient, family string, status string) ([]string, error) {
 	input := ecs.ListTaskDefinitionsInput{}
 
 	if family != "" {
@@ -46,10 +65,14 @@ func GetRevisions(region string, family string, status string) ([]string, error)
 		input.Status = "ACTIVE"
 	}
 
+	paginator := ecs.NewListTaskDefinitionsPaginator(client, &input)
+	return ListAllRevisions(context.TODO(), paginator)
+}
+
+func ListAllRevisions(ctx context.Context, paginator ListTaskDefinitionsPager) ([]string, error) {
 	definitions := []string{}
-	paginater := ecs.NewListTaskDefinitionsPaginator(client, &input)
-	for paginater.HasMorePages() {
-		output, err := paginater.NextPage(context.TODO())
+	for paginator.HasMorePages() {
+		output, err := paginator.NextPage(ctx)
 		if err != nil {
 			return definitions, err
 		}
@@ -58,8 +81,7 @@ func GetRevisions(region string, family string, status string) ([]string, error)
 	return definitions, nil
 }
 
-func DescribeDefinition(region string, name string) (types.TaskDefinition, error) {
-	client := GetClient(region)
+func DescribeDefinition(client ECSTaskDefinitionClient, name string) (types.TaskDefinition, error) {
 	definition, err := client.DescribeTaskDefinition(context.TODO(), &ecs.DescribeTaskDefinitionInput{
 		TaskDefinition: aws.String(name),
 	})

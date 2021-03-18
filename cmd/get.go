@@ -148,7 +148,8 @@ func getTask() {
 	if getOptions.Service != "" {
 		fmt.Printf("Service: %s\n", getOptions.Service)
 	}
-	tasks, err := ecs.GetTask(getOptions.Region, cluster, getOptions.Service, getOptions.Names)
+	client := ecs.GetClient(getOptions.Region)
+	tasks, err := ecs.GetTask(client, cluster, getOptions.Service, getOptions.Names)
 	cobra.CheckErr(err)
 	if len(tasks) == 0 {
 		fmt.Println("No tasks found")
@@ -181,7 +182,8 @@ func getDefinition() {
 }
 
 func showTaskDefinitionFamilies() {
-	families, err := ecs.ListFamily(getOptions.Region, getOptions.Prefix, getOptions.Status)
+	client := ecs.GetClient(getOptions.Region)
+	families, err := ecs.GetFamily(client, getOptions.Prefix, getOptions.Status)
 	cobra.CheckErr(err)
 	if len(families) == 0 {
 		fmt.Println("No task definitions found")
@@ -197,7 +199,8 @@ func showTaskDefinitionFamilies() {
 }
 
 func showTaskDefinitionRevisions() {
-	definitions, err := ecs.GetRevisions(getOptions.Region, getOptions.Family, getOptions.Status)
+	client := ecs.GetClient(getOptions.Region)
+	definitions, err := ecs.GetRevision(client, getOptions.Family, getOptions.Status)
 	cobra.CheckErr(err)
 	if len(definitions) == 0 {
 		fmt.Println("No task definitions found")
@@ -215,7 +218,9 @@ func showTaskDefinitionRevisions() {
 
 func getInstance() {
 	cluster := config.EcsherConfigManager.GetCluster(getOptions.Cluster)
-	instances, err := ecs.GetInstance(getOptions.Region, cluster, getOptions.Names)
+	fmt.Printf("Cluster: %s\n", cluster)
+	client := ecs.GetClient(getOptions.Region)
+	instances, err := ecs.GetInstance(client, cluster, getOptions.Names)
 	cobra.CheckErr(err)
 	if len(instances) == 0 {
 		fmt.Println("No container instances found")
