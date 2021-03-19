@@ -42,7 +42,7 @@ brews:
     tap:
       owner: Mic-U
       name: homebrew-ecsher
-      token: "{{ .Env.GITHUB_TOKEN }}"
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
     url_template: "https://github.com/Mic-U/ecsher/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
     folder: Formula
     homepage: "https://github.com/Mic-U/ecsher"
