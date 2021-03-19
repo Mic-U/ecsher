@@ -36,3 +36,17 @@ changelog:
       - '^test:'
 release:
   prerelease: auto
+brews:
+  - 
+    name: ecsher
+    tap:
+      owner: Mic-U
+      name: homebrew-ecsher
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    url_template: "https://github.com/Mic-U/ecsher/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+    folder: Formula
+    homepage: "https://github.com/Mic-U/ecsher"
+    description: "CLI tool describing ECS resources like kubectl written in Go"
+    license: "Apache-2.0"
+    install: |
+      bin.install "ecsher"
