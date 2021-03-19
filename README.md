@@ -195,3 +195,29 @@ attributes:
 ...
 ```
 
+### Logs
+
+Note: If you saved cluster in config file, you don't need specify `--cluster` flag. 
+ecsher fetch latest 100 logs.
+
+Show service logs.
+If you set `--watch` option, ecsher continues to fetch logs until you interrupt.
+
+```
+$ ecsher logs service --name MyService --watch
+TIMESTAMP                          ID                                    MESSAGE
+2021-02-26 18:55:32.12 +0000 UTC   b35aff85-dd30-43dd-8510-d053544cfad0  (service MyService) has reached a steady state.
+2021-02-27 00:55:53.502 +0000 UTC  1ef46502-d220-43d6-9a2f-d837650ea823  (service MyService) has reached a steady state.
+```
+
+Show task logs.
+If you set `--watch` option, ecsher continues to fetch logs until you interrupt.
+ecsher supports only awslogs logdriver.
+If the task has multiple containers, you must set `--container` option.
+
+```
+$ ecsher logs task --name 8baae5aa33db434d9888171527434fb5 --container devops
+TIMESTAMP                      MESSAGE
+2021-03-19 11:30:33 +0000 UTC  Current latestPublished: 2021-03-19 11:30:31.551286116 +0000 UTC
+2021-03-19 11:30:33 +0000 UTC  No new articles
+```
