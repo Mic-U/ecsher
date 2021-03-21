@@ -9,6 +9,7 @@ import (
 )
 
 const (
+	Awslogs            = "awslogs"
 	LogGroupKey        = "awslogs-group"
 	LogRegionKey       = "awslogs-region"
 	LogStreamPrefixKey = "awslogs-stream-prefix"
@@ -55,4 +56,11 @@ func AscendingSortTaskLogs(logs []cloudwatchTypes.OutputLogEvent) []cloudwatchTy
 		return *logs[i].Timestamp < *logs[j].Timestamp
 	})
 	return logs
+}
+
+func IsAwslogsLogDriver(containerDefinition types.ContainerDefinition) bool {
+	if containerDefinition.LogConfiguration == nil {
+		return false
+	}
+	return containerDefinition.LogConfiguration.LogDriver == Awslogs
 }
