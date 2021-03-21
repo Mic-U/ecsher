@@ -102,3 +102,46 @@ func TestAscendingTaskLogs(t *testing.T) {
 		}
 	}
 }
+
+func TestIsAwslogsLogDriver(t *testing.T) {
+	cases := []struct {
+		container types.ContainerDefinition
+		expected  bool
+	}{
+		{
+			container: types.ContainerDefinition{
+				LogConfiguration: nil,
+			},
+			expected: false,
+		},
+		{
+			container: types.ContainerDefinition{
+				LogConfiguration: &types.LogConfiguration{},
+			},
+			expected: false,
+		},
+		{
+			container: types.ContainerDefinition{
+				LogConfiguration: &types.LogConfiguration{
+					LogDriver: "json",
+				},
+			},
+			expected: false,
+		},
+		{
+			container: types.ContainerDefinition{
+				LogConfiguration: &types.LogConfiguration{
+					LogDriver: "awslogs",
+				},
+			},
+			expected: true,
+		},
+	}
+
+	for _, c := range cases {
+		actual := IsAwslogsLogDriver(c.container)
+		if actual != c.expected {
+			t.Errorf("expect %v, got %v", c.expected, actual)
+		}
+	}
+}

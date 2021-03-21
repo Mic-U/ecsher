@@ -152,7 +152,7 @@ func getTaskLogs() {
 		container = taskDefinition.ContainerDefinitions[0]
 	}
 
-	if container.LogConfiguration.LogDriver != "awslogs" {
+	if !util.IsAwslogsLogDriver(container) {
 		fmt.Println("logDriver must be awslogs")
 		os.Exit(1)
 	}
