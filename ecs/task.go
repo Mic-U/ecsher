@@ -11,6 +11,7 @@ import (
 
 type ECSTaskClient interface {
 	DescribeTasks(context.Context, *ecs.DescribeTasksInput, ...func(*ecs.Options)) (*ecs.DescribeTasksOutput, error)
+	ExecuteCommand(context.Context, *ecs.ExecuteCommandInput, ...func(*ecs.Options)) (*ecs.ExecuteCommandOutput, error)
 	ListTasks(context.Context, *ecs.ListTasksInput, ...func(*ecs.Options)) (*ecs.ListTasksOutput, error)
 }
 
@@ -87,4 +88,25 @@ func DescribeTask(client ECSTaskClient, cluster string, names []string) ([]ecsTy
 		return []ecsTypes.Task{}, err
 	}
 	return describeTasksOutput.Tasks, err
+}
+
+type ExecuteCmmandParams struct {
+	Task        string
+	Container   string
+	Command     string
+	Interactive bool
+}
+
+func ExecuteCommand(client ECSTaskClient, cluster string, params *ExecuteCmmandParams) (*ecs.ExecuteCommandOutput, error) {
+	input := &ecs.ExecuteCommandInput{
+		Cluster:     aws.String(cluster),
+		Task:        aws.String(params.Task),
+		Interactive: params.Interactive,
+		Command:     aws.String(params.Command),
+	}
+	if len(params.Container) > 0 {
+		input.Container = aws.String(params.Container)
+	}
+	executeCommandOutput, err := client.ExecuteCommand(context.TODO(), input)
+	return executeCommandOutput, err
 }

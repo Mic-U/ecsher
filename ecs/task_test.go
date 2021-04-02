@@ -40,6 +40,15 @@ func (m mockTaskClient) ListTasks(ctx context.Context, params *ecs.ListTasksInpu
 	return &m.listTasksOutput, nil
 }
 
+func (m mockTaskClient) ExecuteCommand(ctx context.Context, params *ecs.ExecuteCommandInput, optFns ...func(*ecs.Options)) (*ecs.ExecuteCommandOutput, error) {
+	if len(*params.Cluster) == 0 || len(*params.Task) == 0 {
+		return nil, errors.New("required param is missing")
+	}
+	return &ecs.ExecuteCommandOutput{
+		ClusterArn: params.Cluster,
+	}, nil
+}
+
 type mockTaskPager struct {
 	PageNum int
 	Pages   []*ecs.ListTasksOutput
