@@ -222,3 +222,18 @@ TIMESTAMP                      MESSAGE
 2021-03-19 11:30:33 +0000 UTC  Current latestPublished: 2021-03-19 11:30:31.551286116 +0000 UTC
 2021-03-19 11:30:33 +0000 UTC  No new articles
 ```
+
+### Exec
+
+Prerequisites: You need install [Session Manager Plugin](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html)
+Note: If you saved cluster in config file, you don't need specify `--cluster` flag. 
+
+ecsher wraps ECS ExecutionCommands.
+
+```
+$ ecsher exec 5018d08c0be448ae9040beb6cc5879f4 /bin/bash --container tomcat -i
+Cluster: execcluster-MyCluster-PuhDPGqX8Ej3
+
+Starting session with SessionId: ecs-execute-command-0b4d4ec39fd79a21d
+bash-4.2# 
+```

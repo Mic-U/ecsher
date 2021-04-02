@@ -22,6 +22,7 @@ import (
 	"github.com/Mic-U/ecsher/config"
 	"github.com/Mic-U/ecsher/ecs"
 	"github.com/Mic-U/ecsher/session"
+	"github.com/Mic-U/ecsher/util"
 	"github.com/spf13/cobra"
 )
 
@@ -38,9 +39,15 @@ var execCmd = &cobra.Command{
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		task := args[0]
-		command := args[1]
+		command := util.ExtractCommand(args)
 		exec(task, command)
 	},
+	Example: `  # Exec task which has single container
+  ecsher exec 5018d08c0be448ae9040beb6cc5879f4 /bin/bash -i
+  # Exec task which has multiple container
+  ecsher exec 5018d08c0be448ae9040beb6cc5879f4 /bin/bash --container nginx -i
+  # Exec command with option
+  ecsher exec 5018d08c0be448ae9040beb6cc5879f4 "ls -al" --container nginx -i`,
 }
 
 type ExecOptions struct {
@@ -57,7 +64,7 @@ func init() {
 	execCmd.Flags().StringVarP(&execOptions.Cluster, "cluster", "c", "", "Cluster Name")
 	execCmd.Flags().StringVarP(&execOptions.Region, "region", "r", "", "Region")
 	execCmd.Flags().StringVar(&execOptions.Container, "container", "", "Container Name")
-	execCmd.Flags().BoolVarP(&execOptions.Interactive, "interactive", "i", false, "Interactive mode")
+	execCmd.Flags().BoolVarP(&execOptions.Interactive, "interactive", "i", false, "Interactive mode(Currently, support only interactive mode)")
 }
 
 func exec(taskName string, command string) {

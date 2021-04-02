@@ -13,8 +13,12 @@ const (
 	startSessionAction  = "StartSession"
 )
 
+type SSMPlugingRunner interface {
+	InteractiveRun(name string, args []string) error
+}
+
 type SSMPluginCommand struct {
-	runner term.Runner
+	runner SSMPlugingRunner
 	region string
 }
 
