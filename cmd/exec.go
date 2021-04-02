@@ -69,7 +69,7 @@ func init() {
 
 func exec(taskName string, command string) {
 	region := execOptions.Region
-	cluster := config.EcsherConfigManager.GetCluster(getOptions.Cluster)
+	cluster := config.EcsherConfigManager.GetCluster(execOptions.Cluster)
 	fmt.Printf("Cluster: %s\n", cluster)
 	client := ecs.GetClient(region)
 	output, err := ecs.ExecuteCommand(client, cluster, &ecs.ExecuteCmmandParams{
