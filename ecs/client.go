@@ -12,13 +12,13 @@ import (
 var ECSClient *ecs.Client = nil
 
 // GetClient is singleton function returns ECSClient
-func GetClient(region string) *ecs.Client {
+func GetClient(region string, profile string) *ecs.Client {
 
 	if ECSClient != nil {
 		return ECSClient
 	}
 
-	cfg, err := config.LoadDefaultConfig(context.TODO())
+	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithSharedConfigProfile(profile))
 	if err != nil {
 		panic(err)
 	}
@@ -26,7 +26,6 @@ func GetClient(region string) *ecs.Client {
 	if region != "" {
 		cfg.Region = *aws.String(region)
 	}
-
 	ECSClient = ecs.NewFromConfig(cfg)
 	return ECSClient
 }
