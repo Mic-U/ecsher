@@ -82,7 +82,7 @@ func describeCluster() {
 		fmt.Println("Must specify --name")
 		os.Exit(1)
 	}
-	client := ecs.GetClient(describeOptions.Region)
+	client := ecs.GetClient(describeOptions.Region, RootOptions.profile)
 	clusters, err := ecs.DescribeCluster(client, []string{describeOptions.Name})
 	if len(clusters) == 0 {
 		fmt.Println("No cluster found")
@@ -100,7 +100,7 @@ func describeService() {
 		os.Exit(1)
 	}
 	cluster := config.EcsherConfigManager.GetCluster(describeOptions.Cluster)
-	client := ecs.GetClient(describeOptions.Region)
+	client := ecs.GetClient(describeOptions.Region, RootOptions.profile)
 	services, err := ecs.DescribeService(client, cluster, []string{describeOptions.Name})
 	if len(services) == 0 {
 		fmt.Println("No service found")
@@ -118,7 +118,7 @@ func describeTask() {
 		os.Exit(1)
 	}
 	cluster := config.EcsherConfigManager.GetCluster(describeOptions.Cluster)
-	client := ecs.GetClient(describeOptions.Region)
+	client := ecs.GetClient(describeOptions.Region, RootOptions.profile)
 	tasks, err := ecs.DescribeTask(client, cluster, []string{describeOptions.Name})
 	if len(tasks) == 0 {
 		fmt.Println("No tasks found")
@@ -142,7 +142,7 @@ func describeDefinition() {
 	}
 
 	definitionName := describeOptions.Family + ":" + strconv.Itoa(describeOptions.Revision)
-	client := ecs.GetClient(describeOptions.Region)
+	client := ecs.GetClient(describeOptions.Region, RootOptions.profile)
 	definition, err := ecs.DescribeDefinition(client, definitionName)
 	cobra.CheckErr(err)
 	yamlDefinition, err := yaml.Marshal(definition)
@@ -156,7 +156,7 @@ func describeInstance() {
 		os.Exit(1)
 	}
 	cluster := config.EcsherConfigManager.GetCluster(describeOptions.Cluster)
-	client := ecs.GetClient(describeOptions.Region)
+	client := ecs.GetClient(describeOptions.Region, RootOptions.profile)
 	instances, err := ecs.DescribeInstance(client, cluster, []string{describeOptions.Name})
 	if len(instances) == 0 {
 		fmt.Println("No container instances found")

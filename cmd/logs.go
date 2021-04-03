@@ -81,7 +81,7 @@ func getServiceLogs() {
 		os.Exit(1)
 	}
 	cluster := config.EcsherConfigManager.GetCluster(describeOptions.Cluster)
-	client := ecs.GetClient(describeOptions.Region)
+	client := ecs.GetClient(describeOptions.Region, RootOptions.profile)
 	service, err := ecs.DescribeService(client, cluster, []string{logsOptions.Name})
 	cobra.CheckErr(err)
 
@@ -124,7 +124,7 @@ func getTaskLogs() {
 		os.Exit(1)
 	}
 	cluster := config.EcsherConfigManager.GetCluster(describeOptions.Cluster)
-	ecsClient := ecs.GetClient(describeOptions.Region)
+	ecsClient := ecs.GetClient(describeOptions.Region, RootOptions.profile)
 
 	// GetTask
 	tasks, err := ecs.DescribeTask(ecsClient, cluster, []string{logsOptions.Name})

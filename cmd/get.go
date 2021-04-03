@@ -91,7 +91,7 @@ func init() {
 }
 
 func getCluster() {
-	client := ecs.GetClient(getOptions.Region)
+	client := ecs.GetClient(getOptions.Region, RootOptions.profile)
 	clusters, err := ecs.GetCluster(client, getOptions.Names)
 	cobra.CheckErr(err)
 	if len(clusters) == 0 {
@@ -117,7 +117,7 @@ func getCluster() {
 func getService() {
 	cluster := config.EcsherConfigManager.GetCluster(getOptions.Cluster)
 	fmt.Printf("Cluster: %s\n", cluster)
-	client := ecs.GetClient(getOptions.Region)
+	client := ecs.GetClient(getOptions.Region, RootOptions.profile)
 	services, err := ecs.GetService(client, cluster, getOptions.Names)
 	cobra.CheckErr(err)
 	if len(services) == 0 {
@@ -148,7 +148,7 @@ func getTask() {
 	if getOptions.Service != "" {
 		fmt.Printf("Service: %s\n", getOptions.Service)
 	}
-	client := ecs.GetClient(getOptions.Region)
+	client := ecs.GetClient(getOptions.Region, RootOptions.profile)
 	tasks, err := ecs.GetTask(client, cluster, getOptions.Service, getOptions.Names)
 	cobra.CheckErr(err)
 	if len(tasks) == 0 {
@@ -182,7 +182,7 @@ func getDefinition() {
 }
 
 func showTaskDefinitionFamilies() {
-	client := ecs.GetClient(getOptions.Region)
+	client := ecs.GetClient(getOptions.Region, RootOptions.profile)
 	families, err := ecs.GetFamily(client, getOptions.Prefix, getOptions.Status)
 	cobra.CheckErr(err)
 	if len(families) == 0 {
@@ -199,7 +199,7 @@ func showTaskDefinitionFamilies() {
 }
 
 func showTaskDefinitionRevisions() {
-	client := ecs.GetClient(getOptions.Region)
+	client := ecs.GetClient(getOptions.Region, RootOptions.profile)
 	definitions, err := ecs.GetRevision(client, getOptions.Family, getOptions.Status)
 	cobra.CheckErr(err)
 	if len(definitions) == 0 {
@@ -219,7 +219,7 @@ func showTaskDefinitionRevisions() {
 func getInstance() {
 	cluster := config.EcsherConfigManager.GetCluster(getOptions.Cluster)
 	fmt.Printf("Cluster: %s\n", cluster)
-	client := ecs.GetClient(getOptions.Region)
+	client := ecs.GetClient(getOptions.Region, RootOptions.profile)
 	instances, err := ecs.GetInstance(client, cluster, getOptions.Names)
 	cobra.CheckErr(err)
 	if len(instances) == 0 {
