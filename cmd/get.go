@@ -115,7 +115,7 @@ func getCluster() {
 }
 
 func getService() {
-	cluster := config.EcsherConfigManager.GetCluster(getOptions.Cluster)
+	cluster := config.EcsherConfigManager.GetCluster(getOptions.Cluster, RootOptions.profile)
 	fmt.Printf("Cluster: %s\n", cluster)
 	client := ecs.GetClient(getOptions.Region, RootOptions.profile)
 	services, err := ecs.GetService(client, cluster, getOptions.Names)
@@ -143,7 +143,7 @@ func getService() {
 }
 
 func getTask() {
-	cluster := config.EcsherConfigManager.GetCluster(getOptions.Cluster)
+	cluster := config.EcsherConfigManager.GetCluster(getOptions.Cluster, RootOptions.profile)
 	fmt.Printf("Cluster: %s\n", cluster)
 	if getOptions.Service != "" {
 		fmt.Printf("Service: %s\n", getOptions.Service)
@@ -217,7 +217,7 @@ func showTaskDefinitionRevisions() {
 }
 
 func getInstance() {
-	cluster := config.EcsherConfigManager.GetCluster(getOptions.Cluster)
+	cluster := config.EcsherConfigManager.GetCluster(getOptions.Cluster, RootOptions.profile)
 	fmt.Printf("Cluster: %s\n", cluster)
 	client := ecs.GetClient(getOptions.Region, RootOptions.profile)
 	instances, err := ecs.GetInstance(client, cluster, getOptions.Names)

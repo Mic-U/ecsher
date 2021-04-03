@@ -99,7 +99,7 @@ func describeService() {
 		fmt.Println("Must specify --name")
 		os.Exit(1)
 	}
-	cluster := config.EcsherConfigManager.GetCluster(describeOptions.Cluster)
+	cluster := config.EcsherConfigManager.GetCluster(describeOptions.Cluster, RootOptions.profile)
 	client := ecs.GetClient(describeOptions.Region, RootOptions.profile)
 	services, err := ecs.DescribeService(client, cluster, []string{describeOptions.Name})
 	if len(services) == 0 {
@@ -117,7 +117,7 @@ func describeTask() {
 		fmt.Println("Must specify --name")
 		os.Exit(1)
 	}
-	cluster := config.EcsherConfigManager.GetCluster(describeOptions.Cluster)
+	cluster := config.EcsherConfigManager.GetCluster(describeOptions.Cluster, RootOptions.profile)
 	client := ecs.GetClient(describeOptions.Region, RootOptions.profile)
 	tasks, err := ecs.DescribeTask(client, cluster, []string{describeOptions.Name})
 	if len(tasks) == 0 {
@@ -155,7 +155,7 @@ func describeInstance() {
 		fmt.Println("Must specify --name")
 		os.Exit(1)
 	}
-	cluster := config.EcsherConfigManager.GetCluster(describeOptions.Cluster)
+	cluster := config.EcsherConfigManager.GetCluster(describeOptions.Cluster, RootOptions.profile)
 	client := ecs.GetClient(describeOptions.Region, RootOptions.profile)
 	instances, err := ecs.DescribeInstance(client, cluster, []string{describeOptions.Name})
 	if len(instances) == 0 {

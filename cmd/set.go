@@ -50,7 +50,7 @@ func init() {
 }
 
 func setCluster() {
-	err := config.EcsherConfigManager.SetCluster(setOptions.Name)
+	err := config.EcsherConfigManager.SetCluster(setOptions.Name, RootOptions.profile)
 	cobra.CheckErr(err)
 	fmt.Printf("Cluster: %s\n", setOptions.Name)
 

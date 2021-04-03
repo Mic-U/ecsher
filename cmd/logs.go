@@ -80,7 +80,7 @@ func getServiceLogs() {
 		fmt.Println("Must specify --name")
 		os.Exit(1)
 	}
-	cluster := config.EcsherConfigManager.GetCluster(describeOptions.Cluster)
+	cluster := config.EcsherConfigManager.GetCluster(describeOptions.Cluster, RootOptions.profile)
 	client := ecs.GetClient(describeOptions.Region, RootOptions.profile)
 	service, err := ecs.DescribeService(client, cluster, []string{logsOptions.Name})
 	cobra.CheckErr(err)
@@ -123,7 +123,7 @@ func getTaskLogs() {
 		fmt.Println("Must specify --name")
 		os.Exit(1)
 	}
-	cluster := config.EcsherConfigManager.GetCluster(describeOptions.Cluster)
+	cluster := config.EcsherConfigManager.GetCluster(describeOptions.Cluster, RootOptions.profile)
 	ecsClient := ecs.GetClient(describeOptions.Region, RootOptions.profile)
 
 	// GetTask

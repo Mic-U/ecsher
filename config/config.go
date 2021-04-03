@@ -31,13 +31,15 @@ var EcsherConfigManager = &EcsherConfigManagerStruct{
 	configNames: *configNames,
 }
 
-func (m EcsherConfigManagerStruct) SetCluster(cluster string) error {
-	viper.Set(m.configNames.Cluster, cluster)
+func (m EcsherConfigManagerStruct) SetCluster(cluster string, profile string) error {
+	key := profile + "." + m.configNames.Cluster
+	viper.Set(key, cluster)
 	return m.saveConfig()
 }
 
-func (m EcsherConfigManagerStruct) GetCluster(optionCluster string) string {
-	cfgFileCluster, ok := viper.Get(m.configNames.Cluster).(string)
+func (m EcsherConfigManagerStruct) GetCluster(optionCluster string, profile string) string {
+	key := profile + "." + m.configNames.Cluster
+	cfgFileCluster, ok := viper.Get(key).(string)
 	if !ok {
 		return optionCluster
 	}
