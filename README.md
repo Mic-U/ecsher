@@ -225,7 +225,7 @@ TIMESTAMP                      MESSAGE
 
 ### Exec
 
-Prerequisites: You need install [Session Manager Plugin](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html)
+Prerequisites: You need install [Session Manager Plugin](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html)  
 Note: If you saved cluster in config file, you don't need specify `--cluster` flag. 
 
 ecsher wraps ECS ExecutionCommands.
