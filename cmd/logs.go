@@ -90,7 +90,7 @@ func getServiceLogs() {
 	fmt.Fprintln(w, "TIMESTAMP\tID\tMESSAGE")
 	eventLogs := util.AscendingSortServiceLogs(service[0].Events)
 	for _, eventLog := range eventLogs {
-		fmt.Fprintf(w, "%s\t%s\t%s\n", eventLog.CreatedAt, *eventLog.Id, *eventLog.Message)
+		fmt.Fprintf(w, "%s\t%s\t%s\n", eventLog.CreatedAt.Local(), *eventLog.Id, *eventLog.Message)
 	}
 	w.Flush()
 
@@ -109,7 +109,7 @@ func watchServiceLogs(client ecs.ECSServiceClient, cluster string, latestTimesta
 		additionalLogs = util.FilterServiceLogsByTymestamp(additionalLogs, latestTimestamp)
 		additionalLogs = util.AscendingSortServiceLogs(additionalLogs)
 		for _, eventLog := range additionalLogs {
-			fmt.Fprintf(w, "%s\t%s\t%s\n", eventLog.CreatedAt, *eventLog.Id, *eventLog.Message)
+			fmt.Fprintf(w, "%s\t%s\t%s\n", eventLog.CreatedAt.Local(), *eventLog.Id, *eventLog.Message)
 		}
 		w.Flush()
 		if len(additionalLogs) > 0 {
@@ -166,7 +166,7 @@ func getTaskLogs() {
 	w.Init(os.Stdout, 0, 8, 2, ' ', 0)
 	fmt.Fprintln(w, "TIMESTAMP\tMESSAGE")
 	for _, taskLog := range taskLogs {
-		fmt.Fprintf(w, "%s\t%s\n", time.Unix(*taskLog.Timestamp/1000, 0), *taskLog.Message)
+		fmt.Fprintf(w, "%s\t%s\n", time.Unix(*taskLog.Timestamp/1000, 0).Local(), *taskLog.Message)
 	}
 	w.Flush()
 
@@ -183,7 +183,7 @@ func watchTaskLogs(cloudwatchClient cloudwatchlogs.GetLogEventsAPIClient, logInf
 		cobra.CheckErr(err)
 		taskLogs = util.AscendingSortTaskLogs(taskLogs)
 		for _, taskLog := range taskLogs {
-			fmt.Fprintf(w, "%s\t%s\n", time.Unix(*taskLog.Timestamp/1000, 0), *taskLog.Message)
+			fmt.Fprintf(w, "%s\t%s\n", time.Unix(*taskLog.Timestamp/1000, 0).Local(), *taskLog.Message)
 		}
 		w.Flush()
 		if len(taskLogs) > 0 {
