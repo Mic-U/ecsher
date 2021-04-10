@@ -10,11 +10,11 @@ import (
 
 var LogsClient *cloudwatchlogs.Client = nil
 
-func GetClient(region string) *cloudwatchlogs.Client {
+func GetClient(region string, profile string) *cloudwatchlogs.Client {
 	if LogsClient != nil {
 		return LogsClient
 	}
-	cfg, err := config.LoadDefaultConfig(context.TODO())
+	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithSharedConfigProfile(profile))
 	if err != nil {
 		panic(err)
 	}
