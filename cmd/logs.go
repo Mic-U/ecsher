@@ -158,7 +158,7 @@ func getTaskLogs() {
 	}
 
 	logInformation := util.GetLogInformation(container, util.ArnToName(*tasks[0].TaskArn))
-	cloudwatchClient := cloudwatch.GetClient(logInformation.Region)
+	cloudwatchClient := cloudwatch.GetClient(logInformation.Region, RootOptions.profile)
 	taskLogs, err := cloudwatch.GetTaskLog(cloudwatchClient, logInformation.LogGroup, logInformation.LogStream, nil)
 	cobra.CheckErr(err)
 	taskLogs = util.AscendingSortTaskLogs(taskLogs)

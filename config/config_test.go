@@ -27,4 +27,9 @@ func TestSecCluster(t *testing.T) {
 	if result != nil {
 		t.Fatalf("expect no error, got %v", result)
 	}
+	cluster := viper.Get("hoge.cluster")
+	if cluster != "test1" {
+		t.Fatalf("expect is test1, acutual is %v", cluster)
+	}
+
 }
