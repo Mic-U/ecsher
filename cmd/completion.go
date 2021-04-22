@@ -68,19 +68,26 @@ PowerShell:
 	ValidArgs:             []string{"bash", "zsh", "fish", "powershell"},
 	Args:                  cobra.ExactValidArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		switch args[0] {
-		case "bash":
-			cmd.Root().GenBashCompletion(os.Stdout)
-		case "zsh":
-			cmd.Root().GenZshCompletion(os.Stdout)
-		case "fish":
-			cmd.Root().GenFishCompletion(os.Stdout, true)
-		case "powershell":
-			cmd.Root().GenPowerShellCompletionWithDesc(os.Stdout)
-		}
+		err := runCompletion(cmd, args[0])
+		cobra.CheckErr(err)
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(completionCmd)
+}
+
+func runCompletion(cmd *cobra.Command, arg string) error {
+	switch arg {
+	case "bash":
+		return cmd.Root().GenBashCompletion(os.Stdout)
+	case "zsh":
+		return cmd.Root().GenZshCompletion(os.Stdout)
+	case "fish":
+		return cmd.Root().GenFishCompletion(os.Stdout, true)
+	case "powershell":
+		return cmd.Root().GenPowerShellCompletionWithDesc(os.Stdout)
+	default:
+		return nil
+	}
 }
