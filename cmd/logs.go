@@ -82,13 +82,17 @@ func getServiceLogs() {
 	}
 	cluster := config.EcsherConfigManager.GetCluster(describeOptions.Cluster, RootOptions.profile)
 	client := ecs.GetClient(describeOptions.Region, RootOptions.profile)
-	service, err := ecs.DescribeService(client, cluster, []string{logsOptions.Name})
+	services, err := ecs.DescribeService(client, cluster, []string{logsOptions.Name})
 	cobra.CheckErr(err)
+	if len(services) == 0 {
+		fmt.Println("No service found")
+		os.Exit(1)
+	}
 
 	w := new(tabwriter.Writer)
 	w.Init(os.Stdout, 0, 8, 2, ' ', 0)
 	fmt.Fprintln(w, "TIMESTAMP\tID\tMESSAGE")
-	eventLogs := util.AscendingSortServiceLogs(service[0].Events)
+	eventLogs := util.AscendingSortServiceLogs(services[0].Events)
 	for _, eventLog := range eventLogs {
 		fmt.Fprintf(w, "%s\t%s\t%s\n", eventLog.CreatedAt.Local(), *eventLog.Id, *eventLog.Message)
 	}
@@ -129,6 +133,10 @@ func getTaskLogs() {
 	// GetTask
 	tasks, err := ecs.DescribeTask(ecsClient, cluster, []string{logsOptions.Name})
 	cobra.CheckErr(err)
+	if len(tasks) == 0 {
+		fmt.Println("No task found")
+		os.Exit(1)
+	}
 
 	// GetTaskDefinition
 	taskDefinitionArn := tasks[0].TaskDefinitionArn
