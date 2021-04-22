@@ -237,3 +237,8 @@ Cluster: execcluster-MyCluster-PuhDPGqX8Ej3
 Starting session with SessionId: ecs-execute-command-0b4d4ec39fd79a21d
 bash-4.2# 
 ```
+
+## Completion
+
+ecsher supports autocompletion.  
+Please run `ecsher help completion` command for detail.
