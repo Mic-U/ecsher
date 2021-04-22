@@ -32,6 +32,8 @@ When you use set command, ecsher remembers it`,
 		}
 		return nil
 	},
+	ValidArgs:  []string{"cluster"},
+	ArgAliases: []string{"clusters"},
 	Run: func(cmd *cobra.Command, args []string) {
 		resource := args[0]
 		if util.LikeCluster(resource) {

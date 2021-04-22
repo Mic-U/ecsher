@@ -42,6 +42,8 @@ var logsCmd = &cobra.Command{
 		}
 		return nil
 	},
+	ValidArgs:  []string{"service", "task"},
+	ArgAliases: []string{"services", "svc", "tasks"},
 	Run: func(cmd *cobra.Command, args []string) {
 		resource := args[0]
 		switch {

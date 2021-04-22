@@ -7,6 +7,9 @@ const (
 	ServiceAlias        = "svc"
 )
 
+var ValidResources []string = []string{"cluster", "service", "definition", "task", "instance"}
+var ValidResourceAliases []string = []string{"clusters", "services", "svc", "definitions", "taskdef", "tasks", "instances"}
+
 func LikeCluster(arg string) bool {
 	return strings.Contains(strings.ToLower(arg), "cluster")
 }

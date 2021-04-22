@@ -23,6 +23,8 @@ var getCmd = &cobra.Command{
 		}
 		return nil
 	},
+	ValidArgs:  util.ValidResources,
+	ArgAliases: util.ValidResourceAliases,
 	Run: func(cmd *cobra.Command, args []string) {
 		resource := args[0]
 		switch {
