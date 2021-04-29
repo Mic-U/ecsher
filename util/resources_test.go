@@ -50,6 +50,16 @@ func TestLikeInstance(t *testing.T) {
 	}
 }
 
+func TestLikeCapacityProvider(t *testing.T) {
+	if !LikeCapacityProvider("capacityprovider") {
+		t.Fatal("capacityprovider is LikeInstance")
+	} else if !LikeCapacityProvider("capacityproviders") {
+		t.Fatal("capacityproviders is LikeInstance")
+	} else if !LikeCapacityProvider("cp") {
+		t.Fatal("cp is LikeInstance")
+	}
+}
+
 func TestDivideTaskDefinitionArn(t *testing.T) {
 	cases := []struct {
 		Arn       string
