@@ -40,6 +40,8 @@ var describeCmd = &cobra.Command{
 			describeDefinition()
 		case util.LikeInstance(resource):
 			describeInstance()
+		case util.LikeCapacityProvider(resource):
+			describeCapacityProvider()
 		default:
 			fmt.Printf("%s is not ECS resource\n", resource)
 			os.Exit(1)
@@ -55,6 +57,8 @@ var describeCmd = &cobra.Command{
   ecsher describe definition --family FAMILY_NAME --revision REVISION_NUMBER
   # Describe ContainerInstance
   ecsher describe instance --name CONTAINER_INSTANCE_NAME -c CLUSTER_NAME
+  # Describe CapacityProvider
+  ecsher describe cp --name CAPACITY_PROVIDER_NAME
   `,
 }
 
@@ -169,4 +173,21 @@ func describeInstance() {
 	instance, err := yaml.Marshal(&instances[0])
 	cobra.CheckErr(err)
 	fmt.Println(string(instance))
+}
+
+func describeCapacityProvider() {
+	if describeOptions.Name == "" {
+		fmt.Println("Must specify --name")
+		os.Exit(1)
+	}
+	client := ecs.GetClient(describeOptions.Region, RootOptions.profile)
+	capacityProviders, err := ecs.DescribeCapacityProvider(client, getOptions.Names)
+	cobra.CheckErr(err)
+	if len(capacityProviders) == 0 {
+		fmt.Println("No capacityproviders found")
+		os.Exit(1)
+	}
+	capacityProvider, err := yaml.Marshal(&capacityProviders[0])
+	cobra.CheckErr(err)
+	fmt.Println(string(capacityProvider))
 }
