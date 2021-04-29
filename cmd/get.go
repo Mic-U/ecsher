@@ -14,7 +14,7 @@ import (
 
 // getCmd represents the get command
 var getCmd = &cobra.Command{
-	Use:   "get RESOURCE(cluster, service, task, definition, instance)",
+	Use:   "get RESOURCE(cluster, service, task, definition, instance, capacityprovider)",
 	Short: "Display resources",
 	Long:  `Prints a table of important information about the specifird resources. You can filter the list using --name flag.`,
 	Args: func(cmd *cobra.Command, args []string) error {
@@ -38,6 +38,8 @@ var getCmd = &cobra.Command{
 			getDefinition()
 		case util.LikeInstance(resource):
 			getInstance()
+		case util.LikeCapacityProvider(resource):
+			getCapacityProvider()
 		default:
 			fmt.Printf("%s is not ECS resource\n", resource)
 			os.Exit(1)
@@ -56,6 +58,8 @@ var getCmd = &cobra.Command{
   ecsher get definition --family FAMILY_NAME
   # List Container Instances in the specified cluster
   ecsher get instance -c CLUSTER_NAME
+  # List Capacity Providers
+  ecsher get cp
   `,
 }
 
@@ -243,6 +247,29 @@ func getInstance() {
 			util.GetRemainingMemoryString(instance.RemainingResources),
 			instance.RunningTasksCount,
 			instance.PendingTasksCount,
+		)
+	}
+	w.Flush()
+}
+
+func getCapacityProvider() {
+	client := ecs.GetClient(getOptions.Region, RootOptions.profile)
+	capacityProviders, err := ecs.DescribeCapacityProvider(client, getOptions.Names)
+	cobra.CheckErr(err)
+	if len(capacityProviders) == 0 {
+		fmt.Println("No capacityproviders found")
+		os.Exit(1)
+	}
+	w := new(tabwriter.Writer)
+	w.Init(os.Stdout, 0, 8, 2, ' ', 0)
+	fmt.Fprintln(w, "NAME\tTYPE\tSTATUS\tUPDATE_STATUS")
+	for _, capacityProvider := range capacityProviders {
+		capacityProviderType := util.GetCapacityProviderType(capacityProvider)
+		fmt.Fprintf(w, "%s\t%s\t%s\t%s\n",
+			*capacityProvider.Name,
+			capacityProviderType,
+			capacityProvider.Status,
+			capacityProvider.UpdateStatus,
 		)
 	}
 	w.Flush()

@@ -3,12 +3,13 @@ package util
 import "strings"
 
 const (
-	TaskDefinitionAlias = "taskdef"
-	ServiceAlias        = "svc"
+	TaskDefinitionAlias   = "taskdef"
+	ServiceAlias          = "svc"
+	CapacityProviderAlias = "cp"
 )
 
-var ValidResources []string = []string{"cluster", "service", "definition", "task", "instance"}
-var ValidResourceAliases []string = []string{"clusters", "services", "svc", "definitions", "taskdef", "tasks", "instances"}
+var ValidResources []string = []string{"cluster", "service", "definition", "task", "instance", "capacityprovider"}
+var ValidResourceAliases []string = []string{"clusters", "services", "svc", "definitions", "taskdef", "tasks", "instances", "capacityproviders", "cp"}
 
 func LikeCluster(arg string) bool {
 	return strings.Contains(strings.ToLower(arg), "cluster")
@@ -51,4 +52,11 @@ func DivideTaskDefinitionArn(taskDefinitionArn string) (string, string) {
 		return splited[0], ""
 	}
 	return splited[0], splited[1]
+}
+
+func LikeCapacityProvider(arg string) bool {
+	if arg == CapacityProviderAlias {
+		return true
+	}
+	return strings.Contains(strings.ToLower(arg), "capacityprovider")
 }
