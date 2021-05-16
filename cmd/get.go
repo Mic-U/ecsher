@@ -21,6 +21,10 @@ var getCmd = &cobra.Command{
 		if len(args) < 1 {
 			return errors.New("must specify resource")
 		}
+
+		if !util.IsValidOutputFormat(getOptions.Output) {
+			return errors.New(getOptions.Output + " is invalid output format.")
+		}
 		return nil
 	},
 	ValidArgs:  util.ValidResources,
@@ -72,6 +76,7 @@ type GetOptions struct {
 	Status  string
 	Prefix  string
 	Family  string
+	Output  string
 }
 
 var getOptions GetOptions
@@ -94,6 +99,7 @@ func init() {
 	getCmd.Flags().StringVar(&getOptions.Status, "status", "ACTIVE", "TaskDefinition status(ACTIVE or INACTIVE)")
 	getCmd.Flags().StringVar(&getOptions.Prefix, "prefix", "", "TaskDefinition name prefix")
 	getCmd.Flags().StringVar(&getOptions.Family, "family", "", "TaskDefinition family name")
+	getCmd.Flags().StringVarP(&getOptions.Output, "output", "o", "default", "Output format[default, yaml, json]")
 }
 
 func getCluster() {
@@ -104,20 +110,33 @@ func getCluster() {
 		fmt.Println("No clusters found")
 		os.Exit(1)
 	}
-	w := new(tabwriter.Writer)
-	w.Init(os.Stdout, 0, 8, 2, ' ', 0)
-	fmt.Fprintln(w, "NAME \tSTATUS\tACTIVE_SERVICES\tRUNNING_TASKS\tPENDING_TASKS\tCONTAINER_INSTANCES")
-	for _, cluster := range clusters {
-		fmt.Fprintf(w, "%s \t%s\t%d\t%d\t%d\t%d\n",
-			*cluster.ClusterName,
-			*cluster.Status,
-			cluster.ActiveServicesCount,
-			cluster.RunningTasksCount,
-			cluster.PendingTasksCount,
-			cluster.RegisteredContainerInstancesCount,
-		)
+
+	outputFormat := getOptions.Output
+	switch {
+	case util.IsYamlFormat(outputFormat):
+		output, err := util.OutputAsYaml(clusters)
+		cobra.CheckErr(err)
+		fmt.Println(output)
+	case util.IsJsonFormat(outputFormat):
+		output, err := util.OutputAsJson(clusters)
+		cobra.CheckErr(err)
+		fmt.Println(output)
+	default:
+		w := new(tabwriter.Writer)
+		w.Init(os.Stdout, 0, 8, 2, ' ', 0)
+		fmt.Fprintln(w, "NAME \tSTATUS\tACTIVE_SERVICES\tRUNNING_TASKS\tPENDING_TASKS\tCONTAINER_INSTANCES")
+		for _, cluster := range clusters {
+			fmt.Fprintf(w, "%s \t%s\t%d\t%d\t%d\t%d\n",
+				*cluster.ClusterName,
+				*cluster.Status,
+				cluster.ActiveServicesCount,
+				cluster.RunningTasksCount,
+				cluster.PendingTasksCount,
+				cluster.RegisteredContainerInstancesCount,
+			)
+		}
+		w.Flush()
 	}
-	w.Flush()
 }
 
 func getService() {
@@ -131,21 +150,33 @@ func getService() {
 		os.Exit(1)
 	}
 
-	w := new(tabwriter.Writer)
-	w.Init(os.Stdout, 0, 8, 2, ' ', 0)
-	fmt.Fprintln(w, "NAME \tSTATUS\tLAUNCH_TYPE\tSCHEDULING_STRATEGY\tDESIRED\tRUNNING\tPENDING")
-	for _, service := range services {
-		fmt.Fprintf(w, "%s \t%s\t%s\t%s\t%d\t%d\t%d\n",
-			*service.ServiceName,
-			*service.Status,
-			service.LaunchType,
-			service.SchedulingStrategy,
-			service.DesiredCount,
-			service.RunningCount,
-			service.PendingCount,
-		)
+	outputFormat := getOptions.Output
+	switch {
+	case util.IsYamlFormat(outputFormat):
+		output, err := util.OutputAsYaml(services)
+		cobra.CheckErr(err)
+		fmt.Println(output)
+	case util.IsJsonFormat(outputFormat):
+		output, err := util.OutputAsJson(services)
+		cobra.CheckErr(err)
+		fmt.Println(output)
+	default:
+		w := new(tabwriter.Writer)
+		w.Init(os.Stdout, 0, 8, 2, ' ', 0)
+		fmt.Fprintln(w, "NAME \tSTATUS\tLAUNCH_TYPE\tSCHEDULING_STRATEGY\tDESIRED\tRUNNING\tPENDING")
+		for _, service := range services {
+			fmt.Fprintf(w, "%s \t%s\t%s\t%s\t%d\t%d\t%d\n",
+				*service.ServiceName,
+				*service.Status,
+				service.LaunchType,
+				service.SchedulingStrategy,
+				service.DesiredCount,
+				service.RunningCount,
+				service.PendingCount,
+			)
+		}
+		w.Flush()
 	}
-	w.Flush()
 }
 
 func getTask() {
@@ -162,21 +193,33 @@ func getTask() {
 		os.Exit(1)
 	}
 
-	w := new(tabwriter.Writer)
-	w.Init(os.Stdout, 0, 8, 2, ' ', 0)
-	fmt.Fprintln(w, "NAME \tLAUNCH_TYPE \tGROUP \tCONNECTIVITY \tDESIRED_STATUS \tLAST_STATUS \tHEALTH_STATUS")
-	for _, task := range tasks {
-		fmt.Fprintf(w, "%s \t%s \t%s \t%s \t%s \t%s \t%s \n",
-			util.ArnToName(*task.TaskArn),
-			task.LaunchType,
-			*task.Group,
-			task.Connectivity,
-			*task.DesiredStatus,
-			*task.LastStatus,
-			task.HealthStatus,
-		)
+	outputFormat := getOptions.Output
+	switch {
+	case util.IsYamlFormat(outputFormat):
+		output, err := util.OutputAsYaml(tasks)
+		cobra.CheckErr(err)
+		fmt.Println(output)
+	case util.IsJsonFormat(outputFormat):
+		output, err := util.OutputAsJson(tasks)
+		cobra.CheckErr(err)
+		fmt.Println(output)
+	default:
+		w := new(tabwriter.Writer)
+		w.Init(os.Stdout, 0, 8, 2, ' ', 0)
+		fmt.Fprintln(w, "NAME \tLAUNCH_TYPE \tGROUP \tCONNECTIVITY \tDESIRED_STATUS \tLAST_STATUS \tHEALTH_STATUS")
+		for _, task := range tasks {
+			fmt.Fprintf(w, "%s \t%s \t%s \t%s \t%s \t%s \t%s \n",
+				util.ArnToName(*task.TaskArn),
+				task.LaunchType,
+				*task.Group,
+				task.Connectivity,
+				*task.DesiredStatus,
+				*task.LastStatus,
+				task.HealthStatus,
+			)
+		}
+		w.Flush()
 	}
-	w.Flush()
 }
 
 func getDefinition() {
@@ -195,13 +238,26 @@ func showTaskDefinitionFamilies() {
 		fmt.Println("No task definitions found")
 		os.Exit(1)
 	}
-	w := new(tabwriter.Writer)
-	w.Init(os.Stdout, 0, 8, 2, ' ', 0)
-	fmt.Fprintln(w, "FAMILY")
-	for _, family := range families {
-		fmt.Fprintf(w, "%s\n", family)
+
+	outputFormat := getOptions.Output
+	switch {
+	case util.IsYamlFormat(outputFormat):
+		output, err := util.OutputAsYaml(families)
+		cobra.CheckErr(err)
+		fmt.Println(output)
+	case util.IsJsonFormat(outputFormat):
+		output, err := util.OutputAsJson(families)
+		cobra.CheckErr(err)
+		fmt.Println(output)
+	default:
+		w := new(tabwriter.Writer)
+		w.Init(os.Stdout, 0, 8, 2, ' ', 0)
+		fmt.Fprintln(w, "FAMILY")
+		for _, family := range families {
+			fmt.Fprintf(w, "%s\n", family)
+		}
+		w.Flush()
 	}
-	w.Flush()
 }
 
 func showTaskDefinitionRevisions() {
@@ -212,14 +268,27 @@ func showTaskDefinitionRevisions() {
 		fmt.Println("No task definitions found")
 		os.Exit(1)
 	}
-	w := new(tabwriter.Writer)
-	w.Init(os.Stdout, 0, 8, 2, ' ', 0)
-	fmt.Fprintln(w, "FAMILY \tREVISION")
-	for _, definition := range definitions {
-		family, revision := util.DivideTaskDefinitionArn(definition)
-		fmt.Fprintf(w, "%s \t%s\n", family, revision)
+
+	outputFormat := getOptions.Output
+	switch {
+	case util.IsYamlFormat(outputFormat):
+		output, err := util.OutputAsYaml(definitions)
+		cobra.CheckErr(err)
+		fmt.Println(output)
+	case util.IsJsonFormat(outputFormat):
+		output, err := util.OutputAsJson(definitions)
+		cobra.CheckErr(err)
+		fmt.Println(output)
+	default:
+		w := new(tabwriter.Writer)
+		w.Init(os.Stdout, 0, 8, 2, ' ', 0)
+		fmt.Fprintln(w, "FAMILY \tREVISION")
+		for _, definition := range definitions {
+			family, revision := util.DivideTaskDefinitionArn(definition)
+			fmt.Fprintf(w, "%s \t%s\n", family, revision)
+		}
+		w.Flush()
 	}
-	w.Flush()
 }
 
 func getInstance() {
@@ -232,24 +301,37 @@ func getInstance() {
 		fmt.Println("No container instances found")
 		os.Exit(1)
 	}
-	w := new(tabwriter.Writer)
-	w.Init(os.Stdout, 0, 8, 2, ' ', 0)
-	fmt.Fprintln(w, "NAME\tEC2_INSTANCE_ID\tSTATUS\tDOCKER_VERSION\tAGENT_VERSION\tCONNECTED\tREMAINING_CPU\tREMAINING_MEMORY\tRUNNING\tPENDING")
-	for _, instance := range instances {
-		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%t\t%s\t%s\t%d\t%d\n",
-			util.ArnToName(*instance.ContainerInstanceArn),
-			*instance.Ec2InstanceId,
-			*instance.Status,
-			*instance.VersionInfo.DockerVersion,
-			*instance.VersionInfo.AgentVersion,
-			instance.AgentConnected,
-			util.GetRemainingCpuString(instance.RemainingResources),
-			util.GetRemainingMemoryString(instance.RemainingResources),
-			instance.RunningTasksCount,
-			instance.PendingTasksCount,
-		)
+
+	outputFormat := getOptions.Output
+	switch {
+	case util.IsYamlFormat(outputFormat):
+		output, err := util.OutputAsYaml(instances)
+		cobra.CheckErr(err)
+		fmt.Println(output)
+	case util.IsJsonFormat(outputFormat):
+		output, err := util.OutputAsJson(instances)
+		cobra.CheckErr(err)
+		fmt.Println(output)
+	default:
+		w := new(tabwriter.Writer)
+		w.Init(os.Stdout, 0, 8, 2, ' ', 0)
+		fmt.Fprintln(w, "NAME\tEC2_INSTANCE_ID\tSTATUS\tDOCKER_VERSION\tAGENT_VERSION\tCONNECTED\tREMAINING_CPU\tREMAINING_MEMORY\tRUNNING\tPENDING")
+		for _, instance := range instances {
+			fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%t\t%s\t%s\t%d\t%d\n",
+				util.ArnToName(*instance.ContainerInstanceArn),
+				*instance.Ec2InstanceId,
+				*instance.Status,
+				*instance.VersionInfo.DockerVersion,
+				*instance.VersionInfo.AgentVersion,
+				instance.AgentConnected,
+				util.GetRemainingCpuString(instance.RemainingResources),
+				util.GetRemainingMemoryString(instance.RemainingResources),
+				instance.RunningTasksCount,
+				instance.PendingTasksCount,
+			)
+		}
+		w.Flush()
 	}
-	w.Flush()
 }
 
 func getCapacityProvider() {
@@ -260,17 +342,30 @@ func getCapacityProvider() {
 		fmt.Println("No capacityproviders found")
 		os.Exit(1)
 	}
-	w := new(tabwriter.Writer)
-	w.Init(os.Stdout, 0, 8, 2, ' ', 0)
-	fmt.Fprintln(w, "NAME\tTYPE\tSTATUS\tUPDATE_STATUS")
-	for _, capacityProvider := range capacityProviders {
-		capacityProviderType := util.GetCapacityProviderType(capacityProvider)
-		fmt.Fprintf(w, "%s\t%s\t%s\t%s\n",
-			*capacityProvider.Name,
-			capacityProviderType,
-			capacityProvider.Status,
-			capacityProvider.UpdateStatus,
-		)
+
+	outputFormat := getOptions.Output
+	switch {
+	case util.IsYamlFormat(outputFormat):
+		output, err := util.OutputAsYaml(capacityProviders)
+		cobra.CheckErr(err)
+		fmt.Println(output)
+	case util.IsJsonFormat(outputFormat):
+		output, err := util.OutputAsJson(capacityProviders)
+		cobra.CheckErr(err)
+		fmt.Println(output)
+	default:
+		w := new(tabwriter.Writer)
+		w.Init(os.Stdout, 0, 8, 2, ' ', 0)
+		fmt.Fprintln(w, "NAME\tTYPE\tSTATUS\tUPDATE_STATUS")
+		for _, capacityProvider := range capacityProviders {
+			capacityProviderType := util.GetCapacityProviderType(capacityProvider)
+			fmt.Fprintf(w, "%s\t%s\t%s\t%s\n",
+				*capacityProvider.Name,
+				capacityProviderType,
+				capacityProvider.Status,
+				capacityProvider.UpdateStatus,
+			)
+		}
+		w.Flush()
 	}
-	w.Flush()
 }
