@@ -40,3 +40,7 @@ func IsYamlFormat(outputFormat string) bool {
 func IsJsonFormat(outputFormat string) bool {
 	return outputFormat == "json"
 }
+
+func IsDefaultFormat(outputFormat string) bool {
+	return outputFormat == "default"
+}
