@@ -141,7 +141,10 @@ func getCluster() {
 
 func getService() {
 	cluster := config.EcsherConfigManager.GetCluster(getOptions.Cluster, RootOptions.profile)
-	fmt.Printf("Cluster: %s\n", cluster)
+	outputFormat := getOptions.Output
+	if util.IsDefaultFormat(outputFormat) {
+		fmt.Printf("Cluster: %s\n", cluster)
+	}
 	client := ecs.GetClient(getOptions.Region, RootOptions.profile)
 	services, err := ecs.GetService(client, cluster, getOptions.Names)
 	cobra.CheckErr(err)
@@ -149,8 +152,6 @@ func getService() {
 		fmt.Println("No services found")
 		os.Exit(1)
 	}
-
-	outputFormat := getOptions.Output
 	switch {
 	case util.IsYamlFormat(outputFormat):
 		output, err := util.OutputAsYaml(services)
@@ -181,8 +182,11 @@ func getService() {
 
 func getTask() {
 	cluster := config.EcsherConfigManager.GetCluster(getOptions.Cluster, RootOptions.profile)
-	fmt.Printf("Cluster: %s\n", cluster)
-	if getOptions.Service != "" {
+	outputFormat := getOptions.Output
+	if util.IsDefaultFormat(outputFormat) {
+		fmt.Printf("Cluster: %s\n", cluster)
+	}
+	if getOptions.Service != "" && util.IsDefaultFormat(outputFormat) {
 		fmt.Printf("Service: %s\n", getOptions.Service)
 	}
 	client := ecs.GetClient(getOptions.Region, RootOptions.profile)
@@ -193,7 +197,6 @@ func getTask() {
 		os.Exit(1)
 	}
 
-	outputFormat := getOptions.Output
 	switch {
 	case util.IsYamlFormat(outputFormat):
 		output, err := util.OutputAsYaml(tasks)
@@ -293,7 +296,10 @@ func showTaskDefinitionRevisions() {
 
 func getInstance() {
 	cluster := config.EcsherConfigManager.GetCluster(getOptions.Cluster, RootOptions.profile)
-	fmt.Printf("Cluster: %s\n", cluster)
+	outputFormat := getOptions.Output
+	if util.IsDefaultFormat(outputFormat) {
+		fmt.Printf("Cluster: %s\n", cluster)
+	}
 	client := ecs.GetClient(getOptions.Region, RootOptions.profile)
 	instances, err := ecs.GetInstance(client, cluster, getOptions.Names)
 	cobra.CheckErr(err)
@@ -302,7 +308,6 @@ func getInstance() {
 		os.Exit(1)
 	}
 
-	outputFormat := getOptions.Output
 	switch {
 	case util.IsYamlFormat(outputFormat):
 		output, err := util.OutputAsYaml(instances)

@@ -67,3 +67,39 @@ func TestOutputAsJson(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestIsYamlFormat(t *testing.T) {
+	actual1 := IsYamlFormat("yaml")
+	if !actual1 {
+		t.Errorf("Expected true, but actual false")
+	}
+
+	actual2 := IsYamlFormat("yamll")
+	if actual2 {
+		t.Errorf("Expected false, but actual true")
+	}
+}
+
+func TestIsJsonFormat(t *testing.T) {
+	actual1 := IsJsonFormat("json")
+	if !actual1 {
+		t.Errorf("Expected true, but actual false")
+	}
+
+	actual2 := IsJsonFormat("jsonn")
+	if actual2 {
+		t.Errorf("Expected false, but actual true")
+	}
+}
+
+func TestIsDefaultFormat(t *testing.T) {
+	actual1 := IsDefaultFormat("default")
+	if !actual1 {
+		t.Errorf("Expected true, but actual false")
+	}
+
+	actual2 := IsDefaultFormat("defaultt")
+	if actual2 {
+		t.Errorf("Expected false, but actual true")
+	}
+}
