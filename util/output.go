@@ -21,7 +21,10 @@ func OutputAsYaml(input interface{}) (string, error) {
 	// TO avoid https://github.com/go-yaml/yaml/issues/463
 	jsonInput, _ := OutputAsJson(input)
 	yamlInput := make(map[string]interface{})
-	json.Unmarshal([]byte(jsonInput), &yamlInput)
+	err := json.Unmarshal([]byte(jsonInput), &yamlInput)
+	if err != nil {
+		return "", err
+	}
 	output, err := yaml.Marshal(yamlInput)
 	if err != nil {
 		return "", err
@@ -33,7 +36,10 @@ func OutputAsArrayedYaml(input interface{}) (string, error) {
 	// TO avoid https://github.com/go-yaml/yaml/issues/463
 	jsonInput, _ := OutputAsJson(input)
 	yamlInput := []interface{}{}
-	json.Unmarshal([]byte(jsonInput), &yamlInput)
+	err := json.Unmarshal([]byte(jsonInput), &yamlInput)
+	if err != nil {
+		return "", err
+	}
 	output, err := yaml.Marshal(yamlInput)
 	if err != nil {
 		return "", err
