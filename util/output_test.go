@@ -37,14 +37,17 @@ func TestIsValidOutputFormat(t *testing.T) {
 }
 
 func TestOutputAsYaml(t *testing.T) {
+
+	type fuga struct {
+		Foo int
+	}
+
 	type Hoge struct {
-		hoge string
-		fuga int
+		Hoge string
+		fuga
 	}
-	input := Hoge{
-		hoge: "abcde",
-		fuga: 15,
-	}
+
+	input := Hoge{}
 
 	_, err := OutputAsYaml(input)
 	if err != nil {
@@ -52,15 +55,35 @@ func TestOutputAsYaml(t *testing.T) {
 	}
 }
 
-func TestOutputAsJson(t *testing.T) {
+func TestOutputAsArrayedYaml(t *testing.T) {
+	type fuga struct {
+		Foo int
+	}
+
 	type Hoge struct {
-		hoge string
-		fuga int
+		Hoge string
+		fuga
 	}
-	input := Hoge{
-		hoge: "abcde",
-		fuga: 15,
+
+	input := []Hoge{}
+
+	_, err := OutputAsArrayedYaml(input)
+	if err != nil {
+		t.Fatal(err)
 	}
+}
+
+func TestOutputAsJson(t *testing.T) {
+	type fuga struct {
+		Foo int
+	}
+
+	type Hoge struct {
+		Hoge string
+		fuga
+	}
+
+	input := Hoge{}
 
 	_, err := OutputAsJson(input)
 	if err != nil {

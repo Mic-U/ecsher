@@ -114,7 +114,7 @@ func getCluster() {
 	outputFormat := getOptions.Output
 	switch {
 	case util.IsYamlFormat(outputFormat):
-		output, err := util.OutputAsYaml(clusters)
+		output, err := util.OutputAsArrayedYaml(clusters)
 		cobra.CheckErr(err)
 		fmt.Println(output)
 	case util.IsJsonFormat(outputFormat):
@@ -154,7 +154,7 @@ func getService() {
 	}
 	switch {
 	case util.IsYamlFormat(outputFormat):
-		output, err := util.OutputAsYaml(services)
+		output, err := util.OutputAsArrayedYaml(services)
 		cobra.CheckErr(err)
 		fmt.Println(output)
 	case util.IsJsonFormat(outputFormat):
@@ -199,7 +199,7 @@ func getTask() {
 
 	switch {
 	case util.IsYamlFormat(outputFormat):
-		output, err := util.OutputAsYaml(tasks)
+		output, err := util.OutputAsArrayedYaml(tasks)
 		cobra.CheckErr(err)
 		fmt.Println(output)
 	case util.IsJsonFormat(outputFormat):
@@ -245,7 +245,7 @@ func showTaskDefinitionFamilies() {
 	outputFormat := getOptions.Output
 	switch {
 	case util.IsYamlFormat(outputFormat):
-		output, err := util.OutputAsYaml(families)
+		output, err := util.OutputAsArrayedYaml(families)
 		cobra.CheckErr(err)
 		fmt.Println(output)
 	case util.IsJsonFormat(outputFormat):
@@ -275,7 +275,7 @@ func showTaskDefinitionRevisions() {
 	outputFormat := getOptions.Output
 	switch {
 	case util.IsYamlFormat(outputFormat):
-		output, err := util.OutputAsYaml(definitions)
+		output, err := util.OutputAsArrayedYaml(definitions)
 		cobra.CheckErr(err)
 		fmt.Println(output)
 	case util.IsJsonFormat(outputFormat):
@@ -310,7 +310,7 @@ func getInstance() {
 
 	switch {
 	case util.IsYamlFormat(outputFormat):
-		output, err := util.OutputAsYaml(instances)
+		output, err := util.OutputAsArrayedYaml(instances)
 		cobra.CheckErr(err)
 		fmt.Println(output)
 	case util.IsJsonFormat(outputFormat):
@@ -351,7 +351,7 @@ func getCapacityProvider() {
 	outputFormat := getOptions.Output
 	switch {
 	case util.IsYamlFormat(outputFormat):
-		output, err := util.OutputAsYaml(capacityProviders)
+		output, err := util.OutputAsArrayedYaml(capacityProviders)
 		cobra.CheckErr(err)
 		fmt.Println(output)
 	case util.IsJsonFormat(outputFormat):

@@ -10,7 +10,6 @@ import (
 	"github.com/Mic-U/ecsher/ecs"
 	"github.com/Mic-U/ecsher/util"
 	"github.com/spf13/cobra"
-	"gopkg.in/yaml.v2"
 )
 
 // describeCmd represents the describe command
@@ -95,9 +94,9 @@ func describeCluster() {
 		os.Exit(1)
 	}
 	cobra.CheckErr(err)
-	cluster, err := yaml.Marshal(&clusters[0])
+	cluster, err := util.OutputAsYaml(&clusters[0])
 	cobra.CheckErr(err)
-	fmt.Println(string(cluster))
+	fmt.Println(cluster)
 }
 
 func describeService() {
@@ -113,9 +112,9 @@ func describeService() {
 		os.Exit(1)
 	}
 	cobra.CheckErr(err)
-	service, err := yaml.Marshal(&services[0])
+	service, err := util.OutputAsYaml(&services[0])
 	cobra.CheckErr(err)
-	fmt.Println(string(service))
+	fmt.Println(service)
 }
 
 func describeTask() {
@@ -131,9 +130,9 @@ func describeTask() {
 		os.Exit(1)
 	}
 	cobra.CheckErr(err)
-	task, err := yaml.Marshal(&tasks[0])
+	task, err := util.OutputAsYaml(&tasks[0])
 	cobra.CheckErr(err)
-	fmt.Println(string(task))
+	fmt.Println(task)
 }
 
 func describeDefinition() {
@@ -151,9 +150,9 @@ func describeDefinition() {
 	client := ecs.GetClient(describeOptions.Region, RootOptions.profile)
 	definition, err := ecs.DescribeDefinition(client, definitionName)
 	cobra.CheckErr(err)
-	yamlDefinition, err := yaml.Marshal(definition)
+	yamlDefinition, err := util.OutputAsYaml(definition)
 	cobra.CheckErr(err)
-	fmt.Println(string(yamlDefinition))
+	fmt.Println(yamlDefinition)
 }
 
 func describeInstance() {
@@ -170,9 +169,9 @@ func describeInstance() {
 	}
 	cobra.CheckErr(err)
 
-	instance, err := yaml.Marshal(&instances[0])
+	instance, err := util.OutputAsYaml(&instances[0])
 	cobra.CheckErr(err)
-	fmt.Println(string(instance))
+	fmt.Println(instance)
 }
 
 func describeCapacityProvider() {
@@ -187,7 +186,7 @@ func describeCapacityProvider() {
 		fmt.Println("No capacityproviders found")
 		os.Exit(1)
 	}
-	capacityProvider, err := yaml.Marshal(&capacityProviders[0])
+	capacityProvider, err := util.OutputAsYaml(&capacityProviders[0])
 	cobra.CheckErr(err)
-	fmt.Println(string(capacityProvider))
+	fmt.Println(capacityProvider)
 }

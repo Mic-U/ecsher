@@ -3,7 +3,7 @@ package util
 import (
 	"encoding/json"
 
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 var validOutputFormats []string = []string{"default", "yaml", "json"}
@@ -18,7 +18,29 @@ func IsValidOutputFormat(outputFormat string) bool {
 }
 
 func OutputAsYaml(input interface{}) (string, error) {
-	output, err := yaml.Marshal(input)
+	// TO avoid https://github.com/go-yaml/yaml/issues/463
+	jsonInput, _ := OutputAsJson(input)
+	yamlInput := make(map[string]interface{})
+	err := json.Unmarshal([]byte(jsonInput), &yamlInput)
+	if err != nil {
+		return "", err
+	}
+	output, err := yaml.Marshal(yamlInput)
+	if err != nil {
+		return "", err
+	}
+	return string(output), nil
+}
+
+func OutputAsArrayedYaml(input interface{}) (string, error) {
+	// TO avoid https://github.com/go-yaml/yaml/issues/463
+	jsonInput, _ := OutputAsJson(input)
+	yamlInput := []interface{}{}
+	err := json.Unmarshal([]byte(jsonInput), &yamlInput)
+	if err != nil {
+		return "", err
+	}
+	output, err := yaml.Marshal(yamlInput)
 	if err != nil {
 		return "", err
 	}
