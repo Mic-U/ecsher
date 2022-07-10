@@ -4,6 +4,26 @@ on:
     tags:
     - "v[0-9]+.[0-9]+.[0-9]+"
 jobs:
+  push-to-fig-autocomplete:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.18   
+      - name: Generate the spec
+        run: go run main.go generate-fig-spec > new-ecsher-generated.ts
+      - name: Create Autocomplete PR 
+        uses: withfig/publish-to-fig-autocomplete@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          autocomplete-spec-name: ecsher
+          spec-path: new-ecsher-generated.ts
+          integration: cobra
   goreleaser:
     runs-on: ubuntu-latest
     steps:
