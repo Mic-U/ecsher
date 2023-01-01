@@ -31,10 +31,10 @@ func GetTask(client ECSTaskClient, cluster string, service string, names []strin
 // GetTaskInCluster returns tasks in the Cluster
 func GetTaskInCluster(client ECSTaskClient, cluster string, names []string) ([]ecsTypes.Task, error) {
 	if len(names) == 0 {
-		paginator := ecs.NewListTasksPaginator(client, &ecs.ListTasksInput{
+		paginotors := createListTaskPagers(client, ecs.ListTasksInput{
 			Cluster: aws.String(cluster),
 		})
-		tasks, err := ListAllTasks(context.TODO(), paginator)
+		tasks, err := ListAllTasks(context.TODO(), paginotors)
 		if err != nil {
 			return []ecsTypes.Task{}, err
 		}
@@ -48,11 +48,11 @@ func GetTaskInCluster(client ECSTaskClient, cluster string, names []string) ([]e
 
 // GetTaskInService returns tasks in the Service in the Cluster
 func GetTaskInService(client ECSTaskClient, cluster string, service string, names []string) ([]ecsTypes.Task, error) {
-	paginator := ecs.NewListTasksPaginator(client, &ecs.ListTasksInput{
+	paginotors := createListTaskPagers(client, ecs.ListTasksInput{
 		Cluster:     aws.String(cluster),
 		ServiceName: aws.String(service),
 	})
-	tasks, err := ListAllTasks(context.TODO(), paginator)
+	tasks, err := ListAllTasks(context.TODO(), paginotors)
 	if err != nil {
 		return []ecsTypes.Task{}, err
 	}
@@ -64,15 +64,31 @@ func GetTaskInService(client ECSTaskClient, cluster string, service string, name
 	return DescribeTask(client, cluster, filtered)
 }
 
-func ListAllTasks(ctx context.Context, paginator ListTasksPager) ([]string, error) {
-	tasks := []string{}
-	for paginator.HasMorePages() {
-		output, err := paginator.NextPage(ctx)
-		if err != nil {
-			return []string{}, err
-		}
-		tasks = append(tasks, output.TaskArns...)
+func createListTaskPagers(client ECSTaskClient, defaultInput ecs.ListTasksInput) []ListTasksPager {
+	runningTasksPager := ecs.NewListTasksPaginator(client, &defaultInput)
+
+	var stoppingInput *ecs.ListTasksInput = &ecs.ListTasksInput{}
+	*stoppingInput = defaultInput
+	stoppingInput.DesiredStatus = "STOPPED"
+	stoppingTasksPager := ecs.NewListTasksPaginator(client, stoppingInput)
+	return []ListTasksPager{
+		runningTasksPager, stoppingTasksPager,
 	}
+}
+
+func ListAllTasks(ctx context.Context, paginators []ListTasksPager) ([]string, error) {
+	tasks := []string{}
+
+	for _, paginator := range paginators {
+		for paginator.HasMorePages() {
+			output, err := paginator.NextPage(ctx)
+			if err != nil {
+				return []string{}, err
+			}
+			tasks = append(tasks, output.TaskArns...)
+		}
+	}
+
 	return tasks, nil
 }
 
