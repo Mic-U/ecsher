@@ -20,5 +20,5 @@ import (
 )
 
 func init() {
-	rootCmd.AddCommand(cobracompletefig.CreateCompletionSpecCommand())
+	rootCmd.AddCommand(cobracompletefig.CreateCompletionSpecCommand(cobracompletefig.Opts{Use: "fig"}))
 }
