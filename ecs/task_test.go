@@ -121,6 +121,12 @@ func TestDescribeTask(t *testing.T) {
 	}
 }
 
+func getPaginators(paginator ListTasksPager) []ListTasksPager {
+	return []ListTasksPager{
+		paginator,
+	}
+}
+
 func TestListAllTasks(t *testing.T) {
 	paginator := &mockTaskPager{
 		PageNum: 0,
@@ -136,8 +142,8 @@ func TestListAllTasks(t *testing.T) {
 			},
 		},
 	}
-
-	tasks, err := ListAllTasks(context.TODO(), paginator)
+	paginators := getPaginators(paginator)
+	tasks, err := ListAllTasks(context.TODO(), paginators)
 	if err != nil {
 		t.Fatalf("expect no error, got %v", err)
 	}
