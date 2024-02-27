@@ -23,4 +23,6 @@ jobs:
         with:
           version: latest
       - name: testing
-        run: go test ./...
+        run: |
+          sh setup_dummy_creds.sh
+          go test ./...
