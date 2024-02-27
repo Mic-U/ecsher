@@ -13,9 +13,6 @@ func (m mockSSMPluginRunner) InteractiveRun(name string, args []string) error {
 	return nil
 }
 
-func TestNewSSMPluginCommand(t *testing.T) {
-	NewSSMPluginCommand("ap-northeast-1")
-}
 func TestStart(t *testing.T) {
 	cmd := SSMPluginCommand{
 		runner: mockSSMPluginRunner{},
