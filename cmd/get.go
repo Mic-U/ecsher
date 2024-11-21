@@ -214,7 +214,7 @@ func getTask() {
 			fmt.Fprintf(w, "%s \t%s \t%s \t%s \t%s \t%s \t%s \t%s \n",
 				util.ArnToName(*task.TaskArn),
 				task.LaunchType,
-				*task.CapacityProviderName,
+				util.GetCapacityProviderName(task),
 				*task.Group,
 				task.Connectivity,
 				*task.DesiredStatus,

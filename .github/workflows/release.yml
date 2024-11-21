@@ -14,7 +14,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: 1.22
+          go-version: 1.23
       - name: Generate the spec
         run: go run main.go generate-fig-spec > new-ecsher-generated.ts
       - name: Create Autocomplete PR 
@@ -34,7 +34,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: 1.22
+          go-version: 1.23
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v5
         with:

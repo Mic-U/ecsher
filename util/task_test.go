@@ -1,6 +1,10 @@
 package util
 
-import "testing"
+import (
+	"testing"
+
+	ecsTypes "github.com/aws/aws-sdk-go-v2/service/ecs/types"
+)
 
 func TestFilterTasksByNames(t *testing.T) {
 	cases := []struct {
@@ -48,6 +52,35 @@ func TestFilterTasksByNames(t *testing.T) {
 		resultName := ArnToName(result[0])
 		if resultName != c.names[0] {
 			t.Errorf("expect %v, got %v", c.names[0], resultName)
+		}
+	}
+}
+
+func TestGetCapacityProviderName(t *testing.T) {
+	testTaskName := "test"
+	testCapacityProvider := "FARGATE"
+	cases := []struct {
+		Task     ecsTypes.Task
+		Expected string
+	}{
+		{
+			Task: ecsTypes.Task{
+				TaskArn: &testTaskName,
+			},
+			Expected: "",
+		},
+		{
+			Task: ecsTypes.Task{
+				TaskArn:              &testTaskName,
+				CapacityProviderName: &testCapacityProvider,
+			},
+			Expected: "FARGATE",
+		},
+	}
+	for _, c := range cases {
+		actual := GetCapacityProviderName(c.Task)
+		if actual != c.Expected {
+			t.Fatalf("Expected is %s, but actual is %s", c.Expected, actual)
 		}
 	}
 }
