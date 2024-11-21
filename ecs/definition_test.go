@@ -3,7 +3,6 @@ package ecs
 import (
 	"context"
 	"errors"
-	"fmt"
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
@@ -51,7 +50,7 @@ func (m *mockTaskDefinitionsPager) HasMorePages() bool {
 }
 func (m *mockTaskDefinitionsPager) NextPage(ctx context.Context, optFns ...func(*ecs.Options)) (output *ecs.ListTaskDefinitionsOutput, err error) {
 	if m.PageNum >= len(m.Pages) {
-		return nil, fmt.Errorf("no more pages")
+		return nil, errors.New("no more pages")
 	}
 	output = m.Pages[m.PageNum]
 	m.PageNum++
@@ -68,7 +67,7 @@ func (m *mockTaskDefinitionFamiliesPager) HasMorePages() bool {
 }
 func (m *mockTaskDefinitionFamiliesPager) NextPage(ctx context.Context, optFns ...func(*ecs.Options)) (output *ecs.ListTaskDefinitionFamiliesOutput, err error) {
 	if m.PageNum >= len(m.Pages) {
-		return nil, fmt.Errorf("no more pages")
+		return nil, errors.New("no more pages")
 	}
 	output = m.Pages[m.PageNum]
 	m.PageNum++

@@ -3,7 +3,6 @@ package ecs
 import (
 	"context"
 	"errors"
-	"fmt"
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
@@ -48,7 +47,7 @@ func (m *mockServicePager) HasMorePages() bool {
 
 func (m *mockServicePager) NextPage(ctx context.Context, optFns ...func(*ecs.Options)) (output *ecs.ListServicesOutput, err error) {
 	if m.PageNum >= len(m.Pages) {
-		return nil, fmt.Errorf("no more pages")
+		return nil, errors.New("no more pages")
 	}
 	output = m.Pages[m.PageNum]
 	m.PageNum++
